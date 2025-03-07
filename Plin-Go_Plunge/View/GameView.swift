@@ -3,7 +3,7 @@ import SpriteKit
 
 struct GameView: View {
     
-    @State var currentLevel = 1
+    @State var currentLevel = 2
     @State var gameScene: GameScene
     @State private var isGameOver = false
     @State private var isWin = false
@@ -37,6 +37,15 @@ struct GameView: View {
                 }
 
             }
+            
+            if isWin {
+                WinView {
+                    restartLevel()
+                } onMenu: {
+                    print("menu")
+                }
+
+            }
         }
         .onAppear {
             self.gameScene.scaleMode = .aspectFill
@@ -62,9 +71,9 @@ struct GameView: View {
     
     private func restartLevel() {
         isGameOver = false
+        isWin = false
         gameScene = GameScene(level: currentLevel)
         gameScene.scaleMode = .aspectFill
-        
     }
 }
 

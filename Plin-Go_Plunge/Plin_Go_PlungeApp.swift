@@ -5,7 +5,7 @@ import SwiftUI
 struct Plin_Go_PlungeApp: App {
     var body: some Scene {
         WindowGroup {
-            GameView(currentLevel: 1)
+            GameView(currentLevel: 3)
         }
     }
 }

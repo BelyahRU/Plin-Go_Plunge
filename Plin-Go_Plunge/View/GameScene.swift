@@ -3,11 +3,9 @@ import SpriteKit
 final class GameScene: SKScene {
     
     var currentLevel: Int
-    var firstBlock: SKSpriteNode!
-    var secondBlock: SKSpriteNode!
-    var firstGameArrow: SKSpriteNode!
-    var secondGameArrow: SKSpriteNode!
-    var thirdGameArrow: SKSpriteNode!
+    
+    var arrows: [SKSpriteNode] = []
+    var startArrows: [SKSpriteNode] = []
     var gameBoard: SKSpriteNode!
     var draggingBlock: SKSpriteNode?
     var originalPosition: CGPoint?
@@ -18,9 +16,11 @@ final class GameScene: SKScene {
     var thirdGameArrowIsLocked = false
     
     var usedBlocks: [SKSpriteNode] = []
+    var usedStartBlocksCount = 0
     
     init(level: Int) {
         self.currentLevel = level
+        print(currentLevel)
         super.init(size: UIScreen.main.bounds.size)
     }
     
@@ -31,9 +31,8 @@ final class GameScene: SKScene {
     override func didMove(to view: SKView) {
         configureScene()
         configureSnowBottom()
-        addGameBlocks()
-        setupGameBoard()
-        setupGameArrows()
+        
+        setupLevel()
     }
     
     func configureScene() {
@@ -50,88 +49,30 @@ final class GameScene: SKScene {
         addChild(bottomView)
     }
     
-    func addGameBlocks() {
-        let blockWidth: CGFloat = 74
-        let startBlock1 = SKSpriteNode(imageNamed: "startBlockImage")
-        startBlock1.size = CGSize(width: blockWidth, height: blockWidth)
-        startBlock1.position = CGPoint(x: self.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-        startBlock1.zPosition = 2
-        
-        firstBlock = SKSpriteNode(imageNamed: "rotateRightOneBlock90")
-        firstBlock.size = CGSize(width: blockWidth, height: blockWidth)
-        firstBlock.position = CGPoint(x: self.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-        firstBlock.name = "rotateRightOneBlock90"
-        firstBlock.zPosition = 4
-        addChild(startBlock1)
-        addChild(firstBlock)
-        
-        let startBlock2 = SKSpriteNode(imageNamed: "startBlockImage")
-        startBlock2.size = CGSize(width: blockWidth, height: blockWidth)
-        startBlock2.position = CGPoint(x: self.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-        startBlock2.zPosition = 2
-        
-        secondBlock = SKSpriteNode(imageNamed: "rotateRightOneBlock90")
-        secondBlock.size = CGSize(width: blockWidth, height: blockWidth)
-        secondBlock.position = CGPoint(x: self.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-        secondBlock.name = "rotateRightOneBlock90"
-        secondBlock.zPosition = 4
-        
-        addChild(startBlock2)
-        addChild(secondBlock)
-    }
     
-    func setupGameBoard() {
-        gameBoard = SKSpriteNode(imageNamed: "gameBoard\(currentLevel)")
-        gameBoard.size = CGSize(width: 174, height: 343)
-        gameBoard.position = CGPoint(x: self.size.width / 2 , y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380)
-        gameBoard.zPosition = 2
-        
-        addChild(gameBoard)
-    }
-    
-    func setupGameArrows() {
-        firstGameArrow = SKSpriteNode(imageNamed: "red90Arrow")
-        firstGameArrow.size = CGSize(width: 77, height: 77)
-        firstGameArrow.position = CGPoint(x: self.size.width / 2, y: gameBoard.position.y + 70)
-        firstGameArrow.name = "red90Arrow"
-        firstGameArrow.zPosition = 3
-        
-        addChild(firstGameArrow)
-        
-        secondGameArrow = SKSpriteNode(imageNamed: "pink0Arrow")
-        secondGameArrow.size = CGSize(width: 77, height: 77)
-        secondGameArrow.name = "pink0Arrow"
-        secondGameArrow.position = CGPoint(x: self.size.width / 2, y: gameBoard.position.y)
-        secondGameArrow.zPosition = 3
-        
-        addChild(secondGameArrow)
-        
-        thirdGameArrow = SKSpriteNode(imageNamed: "yellow0Arrow")
-        thirdGameArrow.size = CGSize(width: 77, height: 77)
-        thirdGameArrow.position = CGPoint(x: self.size.width / 2, y: gameBoard.position.y - 70)
-        thirdGameArrow.name = "yellow0Arrow"
-        thirdGameArrow.zPosition = 3
-        
-        addChild(thirdGameArrow)
-        
-    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         
         // Игнорируем касания стрелочек напрямую
-        if firstGameArrow.contains(location) || secondGameArrow.contains(location) || thirdGameArrow.contains(location) {
-            return
+        for arrow in arrows {
+            if arrow.contains(location) {
+                return
+            }
         }
         
         // Проверяем, что касание произошло только на стартовых блоках
-        if firstBlock.contains(location) {
-            draggingBlock = firstBlock
-            originalPosition = firstBlock.position
-        } else if secondBlock.contains(location) {
-            draggingBlock = secondBlock
-            originalPosition = secondBlock.position
+        for i in 0..<startArrows.count {
+            if startArrows[i].contains(location) {
+                draggingBlock = startArrows[i]
+                draggingBlock!.alpha = 0.8
+                if startArrows[i].name!.contains("Two") {
+                    draggingBlock!.size = CGSize(width: startArrows[i].size.width * 2,
+                                                 height: startArrows[i].size.height * 2)
+                }
+                originalPosition = startArrows[i].position
+            }
         }
     }
     
@@ -142,72 +83,165 @@ final class GameScene: SKScene {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        // Добавляем guard, чтобы гарантировать, что draggingBlock точно существует
         guard let draggingBlock = draggingBlock else { return }
-        
         draggingBlock.removeFromParent()  // Убираем блок с экрана
-
+        
         let location = touches.first!.location(in: self)
-        print(originalPosition)
-        // Проверяем, на какую стрелку был перемещен блок
-        if firstGameArrow.contains(location) {
-            let newName = updateNameArrow(gameArrow: firstGameArrow!, gameBlock: draggingBlock)
-            if newName != nil {
-                firstGameArrow.texture = SKTexture(imageNamed: newName!)
-                firstGameArrow.name = newName!
-                usedBlocks.append(draggingBlock)
+        
+        // Если draggingBlock имеет имя, содержащее "Two", проверяем, какие блоки попали в него
+        if draggingBlock.name!.contains("Two") {
+            // Нужно искать блоки, попавшие в область draggingBlock
+            var blocksInArea: [SKSpriteNode] = []
+            if draggingBlock.name!.contains("Horizontal") {
+                blocksInArea = getBlocksInArea(draggingBlock: draggingBlock, count: 2, alignment: "Horizontal")
+            } else {
+                blocksInArea = getBlocksInArea(draggingBlock: draggingBlock, count: 2, alignment: "Vertical")
             }
-            self.draggingBlock = nil
-            originalPosition = nil
-        } else if secondGameArrow.contains(location) {
-            let newName = updateNameArrow(gameArrow: secondGameArrow!, gameBlock: draggingBlock)
-            if newName != nil {
-                secondGameArrow.texture = SKTexture(imageNamed: newName!)
-                secondGameArrow.name = newName!
-                usedBlocks.append(draggingBlock)
+            if blocksInArea.count == 2 {
+                for block in blocksInArea {
+                    // Для каждого найденного блока обновляем имя
+                    let newName = updateNameArrow(gameArrow: block, gameBlock: draggingBlock)  // Предположим, что у нас одна стрелка для этого случая
+                    if newName != nil {
+                        // Обновляем имя и добавляем в использованные
+                        block.texture = SKTexture(imageNamed: newName!)
+                        block.name = newName!
+                        usedBlocks.append(block)
+                    }
+                }
+                usedStartBlocksCount += 1
+                self.draggingBlock = nil
+                originalPosition = nil
             }
-            self.draggingBlock = nil
-            originalPosition = nil
-        } else if thirdGameArrow.contains(location) {
-            let newName = updateNameArrow(gameArrow: thirdGameArrow!, gameBlock: draggingBlock)
-            if newName != nil {
-                thirdGameArrow.texture = SKTexture(imageNamed: newName!)
-                thirdGameArrow.name = newName!
-                usedBlocks.append(draggingBlock)
+        } else {
+            for arrow in arrows {
+                if arrow.contains(location) {
+                    let newName = updateNameArrow(gameArrow: arrow, gameBlock: draggingBlock)
+                    if newName != nil {
+                        arrow.texture = SKTexture(imageNamed: newName!)
+                        arrow.name = newName!
+                        usedBlocks.append(draggingBlock)
+                        usedStartBlocksCount += 1
+                    }
+                    self.draggingBlock = nil
+                    originalPosition = nil
+                }
             }
-            self.draggingBlock = nil
-            originalPosition = nil
-        } else if let originalPosition = originalPosition {
+        }
+        
+        // Проверяем на какую стрелку был перемещен блок
+        
+        if let originalPosition = originalPosition {
             // Если блок не был перемещен на стрелку, возвращаем его на исходную позицию
             draggingBlock.position = originalPosition
+            let size = draggingBlock.size
+            draggingBlock.size = CGSize(width: size.width / 2, height: size.height / 2)
+            draggingBlock.alpha = 1
             addChild(draggingBlock)
         }
         
         // Обязательно сбрасываем draggingBlock в nil
         self.draggingBlock = nil
-        originalPosition = nil  // Также сбрасываем исходную позицию
+        originalPosition = nil
         
         // Проверка условий выигрыша и поражения
         checkWinCondition()
         checkLoseCondition()
     }
-
-
+    
+    func getBlocksInArea(draggingBlock: SKSpriteNode, count: Int, alignment: String) -> [SKSpriteNode] {
+        let minX = draggingBlock.position.x - draggingBlock.frame.size.width / 4
+        let maxX = draggingBlock.position.x + draggingBlock.frame.size.width / 4
+        let minY = draggingBlock.position.y - draggingBlock.frame.size.height / 4
+        let maxY = draggingBlock.position.y + draggingBlock.frame.size.height / 4
+        
+        var blocksInArea: [(block: SKSpriteNode, intersectionArea: CGFloat)] = []
+        
+        // Обходим все возможные блоки в сцене (например, это могут быть все блоки, кроме стрелок)
+        for block in arrows {
+            let blockMinX = block.position.x - block.frame.size.width / 2
+            let blockMaxX = block.position.x + block.frame.size.width / 2
+            let blockMinY = block.position.y - block.frame.size.height / 2
+            let blockMaxY = block.position.y + block.frame.size.height / 2
+            
+            // Проверяем, пересекаются ли прямоугольники (хотя бы на чуть-чуть)
+            if maxX > blockMinX && minX < blockMaxX && maxY > blockMinY && minY < blockMaxY {
+                // Если хотя бы часть block входит в draggingBlock, вычисляем площадь пересечения
+                let intersectionRect = CGRect(
+                    x: max(minX, blockMinX),
+                    y: max(minY, blockMinY),
+                    width: min(maxX, blockMaxX) - max(minX, blockMinX),
+                    height: min(maxY, blockMaxY) - max(minY, blockMinY)
+                )
+                
+                let intersectionArea = intersectionRect.width * intersectionRect.height
+                
+                // Добавляем блок и его площадь пересечения в массив
+                blocksInArea.append((block, intersectionArea))
+            }
+        }
+        
+        // Группируем блоки по alignment (по y для вертикального, по x для горизонтального)
+        var groupedBlocks: [CGFloat: [SKSpriteNode]] = [:]
+        
+        if alignment == "Vertical" {
+            // Группируем по оси Y
+            for (block, _) in blocksInArea {
+                let key = block.position.y  // Используем y как ключ для группировки
+                if groupedBlocks[key] == nil {
+                    groupedBlocks[key] = []
+                }
+                groupedBlocks[key]?.append(block)
+            }
+        } else if alignment == "Horizontal" {
+            // Группируем по оси X
+            for (block, _) in blocksInArea {
+                let key = block.position.x  // Используем x как ключ для группировки
+                if groupedBlocks[key] == nil {
+                    groupedBlocks[key] = []
+                }
+                groupedBlocks[key]?.append(block)
+            }
+        }
+        
+        // Фильтруем только те группы, в которых достаточно блоков (например, 2)
+        var filteredBlocks: [SKSpriteNode] = []
+        for (_, group) in groupedBlocks {
+            if group.count >= 1 {  // Фильтруем, если блоков больше или равно нужному количеству
+                filteredBlocks.append(contentsOf: group)
+            }
+        }
+        
+        // Сортируем блоки по площади пересечения в порядке убывания
+        let sortedBlocks = blocksInArea.filter { block, _ in
+            filteredBlocks.contains(block)
+        }.sorted { $0.intersectionArea > $1.intersectionArea }
+        
+        // Возвращаем только запрашиваемое количество блоков, если их меньше, возвращаем все
+        return sortedBlocks.prefix(count).map { $0.block }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     
     func checkLoseCondition() {
-        if usedBlocks.count == 2 && !isWin {
+        if usedStartBlocksCount == startArrows.count && !isWin {
             print("Lose!")
             NotificationCenter.default.post(name: NSNotification.Name("GameOver"), object: nil)
         }
     }
     
     func checkWinCondition() {
-        let angles = [firstGameArrow, secondGameArrow, thirdGameArrow].compactMap { arrow in
+        let angles = arrows.compactMap { arrow in
             
             return extractAngle(from: arrow.name ?? "")
         }
         print(angles)
-        if angles.count == 3 && angles.allSatisfy({ $0 == angles.first }) {
+        if angles.count == arrows.count && angles.allSatisfy({ $0 == angles.first }) {
             isWin = true
             print("Win!")
             NotificationCenter.default.post(name: NSNotification.Name("Win"), object: nil)
@@ -227,10 +261,22 @@ final class GameScene: SKScene {
     
     func updateNameArrow(gameArrow: SKSpriteNode, gameBlock: SKSpriteNode) -> String? {
         var arrowName = gameArrow.name ?? "nothing"
-        var arrowDegree: Int? = extractAngle(from: arrowName)
+        let arrowDegree: Int? = extractAngle(from: arrowName)
         
         if gameBlock.name == "rotateRightOneBlock90", let _ = arrowDegree {
             let newValue = calculateAngle(angle1: arrowDegree!, angle2: 90)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateOneBlock180", let _ = arrowDegree {
+            let newValue = calculateAngle(angle1: arrowDegree!, angle2: 180)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateRightTwoHorizontalBlocks90", let _ = arrowDegree {
+            let newValue = calculateAngle(angle1: arrowDegree!, angle2: 90)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateLeftTwoVerticalBlocks90", let _ = arrowDegree {
+            let newValue = substractAngle(angle1: arrowDegree!, angle2: 90)
             arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
             return arrowName
         }
@@ -247,5 +293,14 @@ final class GameScene: SKScene {
         }
         return result
     }
-
+    
+    func substractAngle(angle1: Int, angle2: Int) -> Int {
+        var result = angle1 - angle2
+        if result >= 360 {
+            result -= 360
+        } else if result < 0 {
+            result += 360
+        }
+        return result
+    }
 }
