@@ -1,3 +1,5 @@
+
+
 import SpriteKit
 
 final class GameScene: SKScene {
@@ -98,14 +100,26 @@ final class GameScene: SKScene {
                 blocksInArea = getBlocksInArea(draggingBlock: draggingBlock, count: 2, alignment: "Vertical")
             }
             if blocksInArea.count == 2 {
-                for block in blocksInArea {
-                    // Для каждого найденного блока обновляем имя
-                    let newName = updateNameArrow(gameArrow: block, gameBlock: draggingBlock)  // Предположим, что у нас одна стрелка для этого случая
-                    if newName != nil {
-                        // Обновляем имя и добавляем в использованные
-                        block.texture = SKTexture(imageNamed: newName!)
-                        block.name = newName!
-                        usedBlocks.append(block)
+                if draggingBlock.name?.contains("_") == true && draggingBlock.name?.contains("Horizontal") == true {
+                    if let newNames = updateTwoNames(gameArrows: blocksInArea, gameBlock: draggingBlock) {
+                        blocksInArea[0].texture = SKTexture(imageNamed: newNames[0])
+                        blocksInArea[0].name = newNames[0]
+                        usedBlocks.append(blocksInArea[0])
+                        
+                        blocksInArea[1].texture = SKTexture(imageNamed: newNames[1])
+                        blocksInArea[1].name = newNames[1]
+                        usedBlocks.append(blocksInArea[1])
+                    }
+                } else {
+                    for block in blocksInArea {
+                        // Для каждого найденного блока обновляем имя
+                        let newName = updateNameArrow(gameArrow: block, gameBlock: draggingBlock)  // Предположим, что у нас одна стрелка для этого случая
+                        if newName != nil {
+                            // Обновляем имя и добавляем в использованные
+                            block.texture = SKTexture(imageNamed: newName!)
+                            block.name = newName!
+                            usedBlocks.append(block)
+                        }
                     }
                 }
                 usedStartBlocksCount += 1
@@ -216,15 +230,18 @@ final class GameScene: SKScene {
             filteredBlocks.contains(block)
         }.sorted { $0.intersectionArea > $1.intersectionArea }
         
-        // Возвращаем только запрашиваемое количество блоков, если их меньше, возвращаем все
-        return sortedBlocks.prefix(count).map { $0.block }
+        
+        var array = sortedBlocks.prefix(count).map { $0.block }
+            
+        // Проверяем, если draggingBlock содержит "_" и "Horizontal"
+        if draggingBlock.name?.contains("_") == true && draggingBlock.name?.contains("Horizontal") == true {
+            // Если да, сортируем блоки по возрастанию координаты x
+            array.sort { $0.position.x < $1.position.x }
+        }
+        
+        // Возвращаем отсортированные блоки
+        return array
     }
-    
-    
-    
-    
-    
-    
     
     
     
@@ -279,6 +296,51 @@ final class GameScene: SKScene {
             let newValue = substractAngle(angle1: arrowDegree!, angle2: 90)
             arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
             return arrowName
+        } else if gameBlock.name == "rotateLeftOneBlock90", let _ = arrowDegree {
+            let newValue = substractAngle(angle1: arrowDegree!, angle2: 90)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateRightOneBlock45", let _ = arrowDegree {
+            let newValue = calculateAngle(angle1: arrowDegree!, angle2: 45)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateRightOneBlock135", let _ = arrowDegree {
+            let newValue = calculateAngle(angle1: arrowDegree!, angle2: 135)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateLeftOneBlock45", let _ = arrowDegree {
+            let newValue = substractAngle(angle1: arrowDegree!, angle2: 45)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        } else if gameBlock.name == "rotateLeftTwoVerticalBlocks45", let _ = arrowDegree {
+            let newValue = substractAngle(angle1: arrowDegree!, angle2: 45)
+            arrowName = arrowName.replacingOccurrences(of: "\(arrowDegree!)", with: "\(newValue)")
+            return arrowName
+        }
+        
+        return nil
+    }
+    
+    func updateTwoNames(gameArrows: [SKSpriteNode], gameBlock: SKSpriteNode) -> [String]? {
+        var arrowNames: [String] = []
+        var arrowDegrees: [Int?] = []
+        for i in gameArrows {
+            arrowNames.append(i.name ?? "nothing")
+            arrowDegrees.append(extractAngle(from: i.name ?? "nothing"))
+        }
+        
+        if gameBlock.name == "rotateTwoBlocksHorizontal_45_135" {
+            let newValue = calculateAngle(angle1: arrowDegrees[0]!, angle2: 45)
+            arrowNames[0] = arrowNames[0].replacingOccurrences(of: "\(arrowDegrees[0]!)", with: "\(newValue)")
+            let newValue2 = calculateAngle(angle1: arrowDegrees[1]!, angle2: 135)
+            arrowNames[1] = arrowNames[1].replacingOccurrences(of: "\(arrowDegrees[1]!)", with: "\(newValue2)")
+            return arrowNames
+        } else if gameBlock.name == "rotateTwoBlocksHorizontal_90_45" {
+            let newValue = calculateAngle(angle1: arrowDegrees[0]!, angle2: 90)
+            arrowNames[0] = arrowNames[0].replacingOccurrences(of: "\(arrowDegrees[0]!)", with: "\(newValue)")
+            let newValue2 = substractAngle(angle1: arrowDegrees[1]!, angle2: 45)
+            arrowNames[1] = arrowNames[1].replacingOccurrences(of: "\(arrowDegrees[1]!)", with: "\(newValue2)")
+            return arrowNames
         }
         
         return nil
