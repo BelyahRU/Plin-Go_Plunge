@@ -3,10 +3,20 @@ import SwiftUI
 
 @main
 struct Plin_Go_PlungeApp: App {
+    @AppStorage("isInit") var isInit = true
+    
     var body: some Scene {
         WindowGroup {
-//            GameView(currentLevel: 12)
-            ArtifactsView()
+            if isInit {
+                InitialView(onHome: {
+                    isInit = false
+                })
+                .edgesIgnoringSafeArea(.all)
+            } else {
+                MainView()
+                    .edgesIgnoringSafeArea(.all)
+            }
         }
+        
     }
 }

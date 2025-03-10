@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ArtifactsView: View {
     
+    @Environment(\.presentationMode) var presentationMode
+    
     @State var isInfo = false
     @State var currentLvl = 1
     var centerX = ScreenSizes.screenWidth / 2
@@ -28,17 +30,17 @@ struct ArtifactsView: View {
 
                 ScrollView {
                     
-                    VStack(alignment: .center, spacing: 50) {
+                    VStack(alignment: .center, spacing: 30) {
                             ZStack() {
                                 // Кнопка с отступом 16px от левого края
                                 Button {
-                                    print("back")
+                                    presentationMode.wrappedValue.dismiss()
                                 } label: {
                                     Image("backButton")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 50, height: 42)
-                                        .position(x: 16 + 25, y: 100) // Позиция по оси X с учетом отступа
+                                        .position(x: 16 + 25, y: ScreenSizes.isSmallScreen ? 50 : 100) // Позиция по оси X с учетом отступа
                                 }
 
                                 // Image artifactsLabel, расположенный на том же уровне по y, что и кнопка
@@ -46,7 +48,7 @@ struct ArtifactsView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 194, height: 66)
-                                    .position(x: geometry.size.width / 2, y: 100) // Центрируем по X и ставим на 100 по Y
+                                    .position(x: geometry.size.width / 2, y: ScreenSizes.isSmallScreen ? 50 : 100) // Центрируем по X и ставим на 100 по Y
                             }
                         
                         ZStack(alignment: .top) {
@@ -56,20 +58,13 @@ struct ArtifactsView: View {
                                 .position(x: geometry.size.width / 2, y: 100)
                             ForEach(0..<artifactImages.count, id: \.self) { index in
                                     Button {
-                                        print("Tapped \(artifactImages[index])")
-//                                        if !LevelsDataModel.shared.isUnlocked(2) && LevelsDataModel.shared.isUnlocked(index + 1) {
-//                                            currentLvl = index + 1
-//                                        }
-                                        currentLvl = index + 1
-                                        isInfo = true
+                                        if LevelsDataModel.shared.isUnlocked(index + 2) {
+                                            currentLvl = index + 1
+                                            isInfo = true
+                                        }
                                     } label: {
-                                        if !LevelsDataModel.shared.isUnlocked(2){
-                                            Image("lvlImage\(index+1)")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 71, height: 63)
-                                        } else if LevelsDataModel.shared.isUnlocked(index + 1) {
-                                            Image(artifactImages[index])
+                                        if LevelsDataModel.shared.isUnlocked(index + 2) {
+                                            Image(artifactImages[index+1])
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(width: 82, height: 91)  // Размер изображения
@@ -101,6 +96,7 @@ struct ArtifactsView: View {
                     .edgesIgnoringSafeArea(.all)
                 }
             }
+            .navigationBarHidden(true)
             .edgesIgnoringSafeArea(.all)
         }
     }

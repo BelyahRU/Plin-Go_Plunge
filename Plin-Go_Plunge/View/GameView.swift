@@ -47,6 +47,7 @@ struct GameView: View {
 
             }
         }
+        .navigationBarHidden(true)
         .onAppear {
             self.gameScene.scaleMode = .aspectFill
             
