@@ -146,6 +146,7 @@ struct GameView: View {
                 object: nil,
                 queue: .main
             ) { _ in
+                gameScene.timerManager.stop()
                 let _ = HeardsManager.shared.subtractHeards(1)
                 self.isGameOver = true
             }
@@ -159,6 +160,7 @@ struct GameView: View {
                     print("Получено время: \(time)")
                     self.timeOfLevel = time
                 }
+                gameScene.timerManager.stop()
                 if !LevelsDataModel.shared.isUnlocked(currentLevel + 1) {
                     isLevelWinBefore = false
                     LevelsDataModel.shared.unlock(level: currentLevel + 1)
@@ -183,9 +185,13 @@ struct GameView: View {
     }
     
     private func setupNextLevel() {
+        if currentLevel != 15 {
+            currentLevel += 1
+        } else {
+            currentLevel = 1
+        }
         isGameOver = false
         isWin = false
-        currentLevel += 1
         gameScene = GameScene(level: currentLevel)
         gameScene.scaleMode = .aspectFill
     }

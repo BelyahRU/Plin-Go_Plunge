@@ -165,11 +165,11 @@ final class GameScene: SKScene {
         guard let draggingBlock = draggingBlock else { return }
         draggingBlock.removeFromParent()
         let location = touches.first!.location(in: self)
+        var changed = false
         if draggingBlock.name!.contains("Four") {
             getBlocksInArea(draggingBlock: draggingBlock)
             print(draggingBlock.leftUp, draggingBlock.leftDown, draggingBlock.rightUp, draggingBlock.rightDown)
             updateNames()
-            var changed = false
             if let leftUp = draggingBlock.leftUp {
                 for i in arrows {
                     if i == leftUp {
@@ -206,15 +206,9 @@ final class GameScene: SKScene {
                     }
                 }
             }
-            if changed == true {
-                usedStartBlocksCount += 1
-                self.draggingBlock = nil
-                originalPosition = nil
-            }
         } else if draggingBlock.name?.contains("Two") == true {
             getBlocksInArea(draggingBlock: draggingBlock)
             updateNames()
-            var changed = false
             if draggingBlock.name!.contains("Horizontal") {
                 if let left = draggingBlock.left {
                     for i in arrows {
@@ -255,11 +249,6 @@ final class GameScene: SKScene {
                 }
                 
             }
-            if changed == true {
-                usedStartBlocksCount += 1
-                self.draggingBlock = nil
-                originalPosition = nil
-            }
         } else {
             for arrow in arrows {
                 if arrow.contains(location) {
@@ -274,6 +263,11 @@ final class GameScene: SKScene {
                 }
             }
         }
+        if changed == true {
+            usedStartBlocksCount += 1
+            self.draggingBlock = nil
+            originalPosition = nil
+        }
         if let originalPosition = originalPosition {
             draggingBlock.position = originalPosition
             let size = draggingBlock.size
@@ -287,15 +281,33 @@ final class GameScene: SKScene {
         
         checkWinCondition()
         checkLoseCondition()
-        
+        print(usedBlocks)
     }
     
-    func getBlocksInArea(draggingBlock: DraggingBlock)  {
-        let minX = draggingBlock.position.x - draggingBlock.frame.size.width / 4
-        let maxX = draggingBlock.position.x + draggingBlock.frame.size.width / 4
+    // Вспомогательные функции для расчёта расстояния и выбора ближайшего блока
+    func distance(from block: SKSpriteNode, to reference: SKSpriteNode) -> CGFloat {
+        let dx = block.position.x - reference.position.x
+        let dy = block.position.y - reference.position.y
+        return sqrt(dx * dx + dy * dy)
+    }
+
+    func getCloserBlock(existing: SKSpriteNode?, candidate: SKSpriteNode, relativeTo reference: SKSpriteNode) -> SKSpriteNode {
+        if let existing = existing {
+            let existingDistance = distance(from: existing, to: reference)
+            let candidateDistance = distance(from: candidate, to: reference)
+            return candidateDistance < existingDistance ? candidate : existing
+        } else {
+            return candidate
+        }
+    }
+
+    // Обновлённая функция getBlocksInArea
+    func getBlocksInArea(draggingBlock: DraggingBlock) {
+        let minX = draggingBlock.position.x - draggingBlock.frame.size.width / 4 + 5
+        let maxX = draggingBlock.position.x + draggingBlock.frame.size.width / 4 - 5
         let minY = draggingBlock.position.y - draggingBlock.frame.size.height / 8
         let maxY = draggingBlock.position.y + draggingBlock.frame.size.height / 8
-        
+
         var blocksInArea: [(block: SKSpriteNode, intersectionArea: CGFloat)] = []
         
         // Собираем блоки, пересекающиеся с областью draggingBlock
@@ -323,9 +335,9 @@ final class GameScene: SKScene {
                 let dx = block.position.x - draggingBlock.position.x
                 if abs(dx) < 50 {
                     if dx < 0 {
-                        draggingBlock.left = block
+                        draggingBlock.left = getCloserBlock(existing: draggingBlock.left, candidate: block, relativeTo: draggingBlock)
                     } else {
-                        draggingBlock.right = block
+                        draggingBlock.right = getCloserBlock(existing: draggingBlock.right, candidate: block, relativeTo: draggingBlock)
                     }
                 }
             }
@@ -333,9 +345,9 @@ final class GameScene: SKScene {
             for (block, _) in blocksInArea {
                 let dy = block.position.y - draggingBlock.position.y
                 if dy < 0 {
-                    draggingBlock.down = block
+                    draggingBlock.down = getCloserBlock(existing: draggingBlock.down, candidate: block, relativeTo: draggingBlock)
                 } else {
-                    draggingBlock.up = block
+                    draggingBlock.up = getCloserBlock(existing: draggingBlock.up, candidate: block, relativeTo: draggingBlock)
                 }
             }
         } else if draggingBlock.name!.contains("Four") {
@@ -345,32 +357,18 @@ final class GameScene: SKScene {
                 let dy = block.position.y - draggingBlock.position.y
                 
                 if dx < 0 && dy > 0 {
-                    draggingBlock.leftUp = block
+                    draggingBlock.leftUp = getCloserBlock(existing: draggingBlock.leftUp, candidate: block, relativeTo: draggingBlock)
                 } else if dx > 0 && dy > 0 {
-                    draggingBlock.rightUp = block
+                    draggingBlock.rightUp = getCloserBlock(existing: draggingBlock.rightUp, candidate: block, relativeTo: draggingBlock)
                 } else if dx < 0 && dy < 0 {
-                    draggingBlock.leftDown = block
+                    draggingBlock.leftDown = getCloserBlock(existing: draggingBlock.leftDown, candidate: block, relativeTo: draggingBlock)
                 } else if dx > 0 && dy < 0 {
-                    draggingBlock.rightDown = block
-                }
-            }
-        } else if draggingBlock.name!.contains("Four") {
-            for (block, _) in blocksInArea {
-                let dx = block.position.x - draggingBlock.position.x
-                let dy = block.position.y - draggingBlock.position.y
-                
-                if dx < 0 && dy > 0 {
-                    draggingBlock.leftUp = block
-                } else if dx > 0 && dy > 0 {
-                    draggingBlock.rightUp = block
-                } else if dx < 0 && dy < 0 {
-                    draggingBlock.leftDown = block
-                } else if dx > 0 && dy < 0 {
-                    draggingBlock.rightDown = block
+                    draggingBlock.rightDown = getCloserBlock(existing: draggingBlock.rightDown, candidate: block, relativeTo: draggingBlock)
                 }
             }
         }
     }
+
     
     
     
@@ -379,20 +377,27 @@ final class GameScene: SKScene {
             print("Lose!")
             timerManager.stop()
             isPaused = true
-            NotificationCenter.default.post(name: NSNotification.Name("GameOver"), object: nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                NotificationCenter.default.post(name: NSNotification.Name("GameOver"), object: nil)
+            }
         }
     }
     
     func checkWinCondition() {
         let angles = arrows.compactMap { AngleHelper.extractAngle(from: $0.name ?? "") }
-        print(angles)
-        if angles.count == arrows.count && angles.allSatisfy({ $0 == angles.first }) {
+        print(usedBlocks.count)
+        print(startArrows.count)
+        if angles.count == arrows.count && angles.allSatisfy({ $0 == angles.first }) && usedStartBlocksCount == startArrows.count{
             isWin = true
             timerManager.stop()
             isPaused = true
             let time = timerManager.timeOfLevel - timerManager.remainingTime
             print("Win!")
-            NotificationCenter.default.post(name: NSNotification.Name("Win"), object: time)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                NotificationCenter.default.post(name: NSNotification.Name("Win"), object: time)
+            }
+        } else {
+            print("No")
         }
     }
     
@@ -449,6 +454,52 @@ final class GameScene: SKScene {
                     let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
                     draggingBlock!.rightDown!.name! = rightDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
                 }
+            } else if draggingBlock!.name ==  "rotateFourBlocks135_90_90_135" {
+                if let leftUp = draggingBlock!.leftUp {
+                    let arrowDegree = AngleHelper.extractAngle(from: leftUp.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.leftUp!.name! = leftUp.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let leftDown = draggingBlock!.leftDown {
+                    let arrowDegree = AngleHelper.extractAngle(from: leftDown.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.leftDown!.name! = leftDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                
+                if let rightUp = draggingBlock!.rightUp {
+                    let arrowDegree = AngleHelper.extractAngle(from: rightUp.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.rightUp!.name! = rightUp.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                
+                if let rightDown = draggingBlock!.rightDown {
+                    let arrowDegree = AngleHelper.extractAngle(from: rightDown.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.rightDown!.name! = rightDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            } else if draggingBlock!.name ==  "rotateFourBlocks45_135_45_180" {
+                if let leftUp = draggingBlock!.leftUp {
+                    let arrowDegree = AngleHelper.extractAngle(from: leftUp.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.leftUp!.name! = leftUp.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let leftDown = draggingBlock!.leftDown {
+                    let arrowDegree = AngleHelper.extractAngle(from: leftDown.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.leftDown!.name! = leftDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                
+                if let rightUp = draggingBlock!.rightUp {
+                    let arrowDegree = AngleHelper.extractAngle(from: rightUp.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.rightUp!.name! = rightUp.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                
+                if let rightDown = draggingBlock!.rightDown {
+                    let arrowDegree = AngleHelper.extractAngle(from: rightDown.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 180)
+                    draggingBlock!.rightDown!.name! = rightDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
             }
         } else if draggingBlock!.name!.contains("Horizontal") {
             if draggingBlock!.name == "rotateTwoBlocksHorizontal_45_135" {
@@ -498,6 +549,39 @@ final class GameScene: SKScene {
                     let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 45)
                     draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
                 }
+            } else if draggingBlock!.name ==  "rotateTwoBlocksHorizontal_135_90" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            } else if draggingBlock!.name ==  "rotateTwoBlocksHorizontal_135_45" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            } else if draggingBlock!.name ==  "rotateTwoBlocksHorizontal_45_90" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
             }
         }else if draggingBlock!.name!.contains("Vertical") {
             if draggingBlock!.name == "rotateLeftTwoVerticalBlocks90" {
@@ -525,6 +609,40 @@ final class GameScene: SKScene {
                     let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
                     draggingBlock!.down!.name! = down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
                     
+                }
+            } else if draggingBlock!.name == "rotateTwoBlocksVertical_135_45" {
+                if let up = draggingBlock!.up {
+                    let arrowDegree = AngleHelper.extractAngle(from: up.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.up!.name! = up.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let down = draggingBlock!.down {
+                    let arrowDegree = AngleHelper.extractAngle(from: down.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.down!.name! = down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                    
+                }
+            } else if draggingBlock!.name == "rotateTwoBlocksVertical_135_135" {
+                if let up = draggingBlock!.up {
+                    let arrowDegree = AngleHelper.extractAngle(from: up.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.up!.name! = up.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let down = draggingBlock!.down {
+                    let arrowDegree = AngleHelper.extractAngle(from: down.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.down!.name! = down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            } else if draggingBlock!.name == "rotateTwoBlocksVertical_180_90" {
+                if let up = draggingBlock!.up {
+                    let arrowDegree = AngleHelper.extractAngle(from: up.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 180)
+                    draggingBlock!.up!.name! = up.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let down = draggingBlock!.down {
+                    let arrowDegree = AngleHelper.extractAngle(from: down.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.down!.name! = down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
                 }
             }
         }

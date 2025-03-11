@@ -16,14 +16,10 @@ struct Plin_Go_PlungeApp: App {
                 MainView()
                     .edgesIgnoringSafeArea(.all)
                     .onAppear {
-//                        HeardsManager.shared
                     }
-                
-//                WinView(onNextLevel: {
+//                GameView(currentLevel: 10) {
 //                    print()
-//                }, onMenu: {
-//                    print()
-//                }, time: 10, level: 1, isLevelWinBefore: false)
+//                }
             }
         }
         

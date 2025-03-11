@@ -25,6 +25,9 @@ final class LevelSetupManager {
         case 10: setup10Level()
         case 11: setup11Level()
         case 12: setup12Level()
+        case 13: setup13Level()
+        case 14: setup14Level()
+        case 15: setup15Level()
         default: setup1Level()
         }
     }
@@ -37,25 +40,6 @@ final class LevelSetupManager {
         scene.gameBoard.zPosition = 2
         scene.addChild(scene.gameBoard)
     }
-    
-//    private func addGameBlocks(count: Int, positions: [CGPoint], images: [String]) {
-//        for i in 0..<count {
-////            let startBlockBack = SKSpriteNode(imageNamed: "startBlockImage")
-////            startBlockBack.size = CGSize(width: 74, height: 74)
-////            startBlockBack.position = positions[i]
-////            startBlockBack.zPosition = 2
-////            
-////            let startBlock = SKSpriteNode(imageNamed: images[i])
-////            startBlock.size = CGSize(width: 74, height: 74)
-////            startBlock.position = positions[i]
-////            startBlock.name = images[i]
-////            startBlock.zPosition = 4
-////            scene.addChild(startBlockBack)
-////            scene.addChild(startBlock)
-////            scene.startArrows.append(startBlock)
-//            
-//        }
-//    }
     
     private func addGameBlocks(count: Int, positions: [CGPoint], images: [String]) {
         for i in 0..<count {
@@ -294,8 +278,8 @@ final class LevelSetupManager {
                         CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
                       ],
                       images: [
-                        "rotateOneBlock180",
-                        "rotateLeftOneBlock90"
+                        "rotateTwoBlocksHorizontal_135_45",
+                        "rotateTwoBlocksHorizontal_45_90"
                       ])
         setupGameArrows(count: 3,
                         positions: [
@@ -306,7 +290,7 @@ final class LevelSetupManager {
                         images: [
                             "yellow0Arrow",
                             "pink270Arrow",
-                            "red180Arrow"
+                            "red135Arrow"
                         ])
     }
     
@@ -431,6 +415,95 @@ final class LevelSetupManager {
                             "red135Arrow",
                             "orange0Arrow",
                             "yellow0Arrow"
+                        ])
+    }
+    
+    private func setup13Level() {
+        setupGameBoard(
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            size: CGSize(width: 273 / 1.3, height: 281 / 1.3)
+        )
+        addGameBlocks(count: 2,
+                      positions: [
+                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
+                      ],
+                      images: [
+                        "rotateFourBlocks135_90_90_135",
+                        "rotateOneBlock180"
+                      ])
+        setupGameArrows(count: 3,
+                        positions: [
+                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y - 30),
+                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y - 30),
+                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y + 40),
+                        ],
+                        images: [
+                            "green45Arrow",
+                            "red315Arrow",
+                            "orange90Arrow",
+                        ])
+    }
+    
+    private func setup14Level() {
+        setupGameBoard(
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            size: CGSize(width: 248 / 1.3, height: 259 / 1.3)
+        )
+        addGameBlocks(count: 3,
+                      positions: [
+                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
+                      ],
+                      images: [
+                        "rotateTwoBlocksVertical_135_45",
+                        "rotateTwoBlocksHorizontal_135_90",
+                        "rotateOneBlock180"
+                      ])
+        setupGameArrows(count: 3,
+                        positions: [
+                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y + 40),
+                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y + 40),
+                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y - 32),
+                        ],
+                        images: [
+                            "red90Arrow",
+                            "green135Arrow",
+                            "pink45Arrow",
+                        ])
+    }
+    
+    private func setup15Level() {
+        setupGameBoard(
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            size: CGSize(width: 259 / 1.3, height: 343 / 1.3)
+        )
+        addGameBlocks(count: 3,
+                      positions: [
+                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
+                      ],
+                      images: [
+                        "rotateTwoBlocksVertical_135_135",
+                        "rotateTwoBlocksVertical_180_90",
+                        "rotateFourBlocks45_135_45_180"
+                      ])
+        setupGameArrows(count: 5,
+                        positions: [
+                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y + 77),
+                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y + 77),
+                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y - 68),
+                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y + 5),
+                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y - 68),
+                        ],
+                        images: [
+                            "orange225Arrow",
+                            "red225Arrow",
+                            "yellow45Arrow",
+                            "red270Arrow",
+                            "green180Arrow",
                         ])
     }
 }
