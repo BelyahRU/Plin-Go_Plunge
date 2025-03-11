@@ -18,6 +18,11 @@ struct Plin_Go_PlungeApp: App {
                     .onAppear {
 //                        HeardsManager.shared
                     }
+//                WinView(onNextLevel: {
+//                    print()
+//                }, onMenu: {
+//                    print()
+//                }, time: 10, level: 1, isLevelWinBefore: false)
             }
         }
         

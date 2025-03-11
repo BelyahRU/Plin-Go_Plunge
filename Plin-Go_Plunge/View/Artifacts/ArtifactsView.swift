@@ -16,7 +16,11 @@ struct ArtifactsView: View {
         
         // Массив имен изображений кнопок
         let artifactImages: [String] = [
-            "artifact1", "artifact2", "artifact3", "artifact4", "artifact5",
+            "artifact1",
+            "artifact2",
+            "artifact3",
+            "artifact4",
+            "artifact5",
             "artifact6", "artifact7", "artifact8", "artifact9", "artifact10",
             "artifact11", "artifact12", "artifact13", "artifact14", "artifact15"
         ]
@@ -64,7 +68,7 @@ struct ArtifactsView: View {
                                         }
                                     } label: {
                                         if LevelsDataModel.shared.isUnlocked(index + 2) {
-                                            Image(artifactImages[index+1])
+                                            Image("artifact\(index+1)")
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(width: 82, height: 91)  // Размер изображения

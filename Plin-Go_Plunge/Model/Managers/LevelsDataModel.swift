@@ -2,7 +2,7 @@
 import Foundation
 
 //MARK: - Levels
-class LevelsDataModel {
+final class LevelsDataModel {
     static let shared = LevelsDataModel()
     
     private let total = 15
@@ -32,13 +32,19 @@ class LevelsDataModel {
     }
     
     public func isUnlocked(_ level: Int) -> Bool {
-        return levelsArray[String(level)] ?? false
+        if level >= 1 && level <= 15 {
+            return levelsArray[String(level)] ?? false
+        }
+        
+        return false
     }
     
     
     
     public func unlock(level: Int) {
-        levelsArray[String(level)] = true
+        if level >= 1 && level <= 15 {
+            levelsArray[String(level)] = true
+        }
     }
 }
 

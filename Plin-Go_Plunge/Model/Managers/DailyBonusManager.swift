@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 
-class DailyBonusManager: ObservableObject {
+final class DailyBonusManager: ObservableObject {
     static let shared = DailyBonusManager()
     
     // MARK: - UserDefaults Keys

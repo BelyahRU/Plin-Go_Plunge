@@ -37,6 +37,7 @@ struct MainView: View {
                             .font(.custom("Kavoon-Regular", size: 30))
                             .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
+                            .customeStroke(color: Color(red: 32/255.0, green: 102/255.0, blue: 173/255.0), width: 3)
                     }
                     .position(x: ScreenSizes.screenWidth / 2, y: ScreenSizes.screenHeight - (ScreenSizes.isSmallScreen ? 100 : 150))
                     

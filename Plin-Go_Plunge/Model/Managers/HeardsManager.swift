@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-class HeardsManager: ObservableObject {
+final class HeardsManager: ObservableObject {
     
     static let shared = HeardsManager()
     

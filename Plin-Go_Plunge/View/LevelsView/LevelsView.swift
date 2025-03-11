@@ -48,7 +48,7 @@ struct LevelsView: View {
                                 .frame(width: 343, height: 429)
                             
             //                Spacer(minLength: 20)
-                            VStack(spacing: -7) {
+                            VStack(spacing: -20) {
                                 
                                 HStack(spacing: 20) {
                                     ForEach(startIndex..<min(startIndex + 2, endIndex), id: \.self) { index in
@@ -77,10 +77,19 @@ struct LevelsView: View {
                                                 .padding(10)
                                                 Text("Best time:")
                                                     .font(.custom("Kavoon-Regular", size: 23))
-                                                    .foregroundStyle(Color(red: 32/255, green: 102/255, blue: 173/255))
-                                                Text("120s")
+                                                    .foregroundStyle(.white)
+                                                    .customeStroke(
+                                                        color: Color(red: 32/255.0, green: 102/255.0, blue: 173/255.0),
+                                                        width: 2
+                                                    )
+                                                Text("\(BestTimeManager.shared.bestTime(for: levelNumber)!)s")
                                                     .font(.custom("Amiri-Bold", size: 23))
-                                                    .foregroundStyle(Color(red: 32/255, green: 102/255, blue: 173/255))
+                                                    .foregroundStyle(Color(red: 0/255, green: 255/255, blue: 195/255))
+                                                
+                                                    .customeStroke(
+                                                        color: Color(red: 32/255.0, green: 102/255.0, blue: 173/255.0),
+                                                        width: 2
+                                                    )
                                             }
                                         }
                                     }
@@ -116,10 +125,19 @@ struct LevelsView: View {
                                                 .padding(10)
                                                 Text("Best time:")
                                                     .font(.custom("Kavoon-Regular", size: 23))
-                                                    .foregroundStyle(Color(red: 32/255, green: 102/255, blue: 173/255))
-                                                Text("120s")
+                                                    .foregroundStyle(.white)
+                                                    .customeStroke(
+                                                        color: Color(red: 32/255.0, green: 102/255.0, blue: 173/255.0),
+                                                        width: 2
+                                                    )
+                                                Text("\(BestTimeManager.shared.bestTime(for: levelNumber)!)s")
                                                     .font(.custom("Amiri-Bold", size: 23))
-                                                    .foregroundStyle(Color(red: 32/255, green: 102/255, blue: 173/255))
+                                                    .foregroundStyle(Color(red: 0/255, green: 255/255, blue: 195/255))
+                                                
+                                                    .customeStroke(
+                                                        color: Color(red: 32/255.0, green: 102/255.0, blue: 173/255.0),
+                                                        width: 2
+                                                    )
                                                 
                                             }
                                             .padding(.leading, levelNumber == 15 ? 50 : 0)

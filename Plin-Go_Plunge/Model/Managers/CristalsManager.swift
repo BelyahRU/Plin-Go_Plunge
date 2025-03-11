@@ -1,7 +1,7 @@
 
 import Foundation
 
-class CristalsManager: ObservableObject {
+final class CristalsManager: ObservableObject {
     
     static let shared = CristalsManager()
 

@@ -5,6 +5,10 @@ struct GameView: View {
     
     var onMain: () -> Void
     
+    //win
+    @State var timeOfLevel = 120
+    @State private var isLevelWinBefore = true
+    
     @State var currentLevel = 2
     @State var gameScene: GameScene
     @State private var isGameOver = false
@@ -37,7 +41,8 @@ struct GameView: View {
                     Button {
                         isPaused = true
                         gameScene.isPaused = true
-                        gameScene.timer?.invalidate()
+//                        gameScene.timer?.invalidate()
+                        gameScene.timerManager.stop()
                     } label: {
                         Image("pauseButton")
                             .resizable()
@@ -49,7 +54,8 @@ struct GameView: View {
                     Button {
                         isHeart = true
                         gameScene.isPaused = true
-                        gameScene.timer?.invalidate()
+//                        gameScene.timer?.invalidate()
+                        gameScene.timerManager.stop()
                     } label: {
                         Image("replayButton")
                             .resizable()
@@ -72,33 +78,33 @@ struct GameView: View {
                 .blur(radius: (isGameOver || isWin || isPaused || isHeart) ? 5 : 0)
             if isGameOver {
                 GameOverView {
-                    restartLevel()
                     isHeart = true
                 } onMenu: {
-                    
-                    print("menu")
+                    onMain()
                 }
 
             }
             
             if isWin {
-                WinView {
+                WinView(onNextLevel: {
                     setupNextLevel()
-                } onMenu: {
-                    print("menu")
-                }
-
+                }, onMenu: {
+                    onMain()
+                }, time: timeOfLevel,
+                    level: currentLevel,
+                    isLevelWinBefore: isLevelWinBefore
+                )
             }
             
             if isPaused {
                 PauseView {
                     isPaused = false
                     gameScene.isPaused = false
-                    gameScene.startTimer()
+//                    gameScene.startTimer()
+                    gameScene.timerManager.start()
                 } onMenu: {
                     onMain()
                 } onShop: {
-                    print("shop")
                     isShopOpened = true
                     isPaused = false
                 }
@@ -106,7 +112,6 @@ struct GameView: View {
             }
             
             if isShopOpened {
-
                 ShopView(onBack: {
                     isShopOpened = false
                     isPaused = true
@@ -119,13 +124,15 @@ struct GameView: View {
                     if HeardsManager.shared.subtractHeards(1) {
                         isHeart = false
                         gameScene.isPaused = false
-                        gameScene.startTimer()
+//                        gameScene.startTimer()
+                        gameScene.timerManager.start()
                         restartLevel()
                     }
                 } onBack: {
                     isHeart = false
                     gameScene.isPaused = false
-                    gameScene.startTimer()
+//                    gameScene.startTimer()
+                    gameScene.timerManager.start()
                 }
 
             }
@@ -139,6 +146,7 @@ struct GameView: View {
                 object: nil,
                 queue: .main
             ) { _ in
+                let _ = HeardsManager.shared.subtractHeards(1)
                 self.isGameOver = true
             }
             
@@ -146,9 +154,23 @@ struct GameView: View {
                 forName: NSNotification.Name("Win"),
                 object: nil,
                 queue: .main
-            ) { _ in
-                self.isWin = true 
+            ) { notification in
+                if let time = notification.object as? Int {
+                    print("Получено время: \(time)")
+                    self.timeOfLevel = time
+                }
+                if !LevelsDataModel.shared.isUnlocked(currentLevel + 1) {
+                    isLevelWinBefore = false
+                    LevelsDataModel.shared.unlock(level: currentLevel + 1)
+                    CristalsManager.shared.addCristals(100)
+                } else {
+                    isLevelWinBefore = true
+                    CristalsManager.shared.addCristals(50)
+                }
+                
+                self.isWin = true
             }
+
         }
     }
     
