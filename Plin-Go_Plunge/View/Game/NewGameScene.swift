@@ -1,479 +1,37 @@
 
 import SpriteKit
 import UIKit
+import SpriteKit
 
-// MARK: - TimerManager
-final class TimerManager {
-    private var timer: Timer?
-    private(set) var remainingTime: Int
-    let timeOfLevel: Int
-    var onTick: ((Int) -> Void)?
-    var onTimeout: (() -> Void)?
-    
-    init(timeOfLevel: Int) {
-        self.timeOfLevel = timeOfLevel
-        self.remainingTime = timeOfLevel
-    }
-    
-    func start() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            if self.remainingTime > 0 {
-                self.remainingTime -= 1
-                self.onTick?(self.remainingTime)
-            } else {
-                self.timer?.invalidate()
-                self.onTimeout?()
-            }
-        }
-    }
-    
-    func stop() {
-        timer?.invalidate()
-    }
+enum Positions {
+    case left
+    case right
+    case up
+    case down
 }
 
-// MARK: - AngleHelper
-struct AngleHelper {
-    static func calculateAngle(angle1: Int, angle2: Int) -> Int {
-        var result = angle1 + angle2
-        if result >= 360 {
-            result -= 360
-        } else if result < 0 {
-            result += 360
-        }
-        return result
+final class DraggingBlock: SKSpriteNode {
+    
+    // Basic adjacent blocks
+    var left: SKSpriteNode?
+    var right: SKSpriteNode?
+    var up: SKSpriteNode?
+    var down: SKSpriteNode?
+    
+    // Additional parameters for triple/quad blocks
+    var leftDown: SKSpriteNode?
+    var leftUp: SKSpriteNode?
+    var rightUp: SKSpriteNode?
+    var rightDown: SKSpriteNode?
+    
+    // MARK: - Initializers
+    
+    override init(texture: SKTexture?, color: UIColor, size: CGSize) {
+        super.init(texture: texture, color: color, size: size)
     }
     
-    static func subtractAngle(angle1: Int, angle2: Int) -> Int {
-        var result = angle1 - angle2
-        if result >= 360 {
-            result -= 360
-        } else if result < 0 {
-            result += 360
-        }
-        return result
-    }
-    
-    static func extractAngle(from arrowName: String) -> Int? {
-        let regex = try! NSRegularExpression(pattern: "\\d+", options: [])
-        if let match = regex.firstMatch(in: arrowName, options: [], range: NSRange(location: 0, length: arrowName.count)) {
-            let numberString = (arrowName as NSString).substring(with: match.range)
-            return Int(numberString)
-        }
-        return nil
-    }
-}
-
-// MARK: - LevelSetupManager
-final class LevelSetupManager {
-    unowned let scene: GameScene
-    
-    init(scene: GameScene) {
-        self.scene = scene
-    }
-    
-    func setupLevel(_ level: Int) {
-        switch level {
-        case 1: setup1Level()
-        case 2: setup2Level()
-        case 3: setup3Level()
-        case 4: setup4Level()
-        case 5: setup5Level()
-        case 6: setup6Level()
-        case 7: setup7Level()
-        case 8: setup8Level()
-        case 9: setup9Level()
-        case 10: setup10Level()
-        case 11: setup11Level()
-        case 12: setup12Level()
-        default: setup1Level()
-        }
-    }
-    
-    // Common methods
-    private func setupGameBoard(position: CGPoint, size: CGSize) {
-        scene.gameBoard = SKSpriteNode(imageNamed: "gameBoard\(scene.currentLevel)")
-        scene.gameBoard.size = size
-        scene.gameBoard.position = position
-        scene.gameBoard.zPosition = 2
-        scene.addChild(scene.gameBoard)
-    }
-    
-    private func addGameBlocks(count: Int, positions: [CGPoint], images: [String]) {
-        for i in 0..<count {
-            let startBlockBack = SKSpriteNode(imageNamed: "startBlockImage")
-            startBlockBack.size = CGSize(width: 74, height: 74)
-            startBlockBack.position = positions[i]
-            startBlockBack.zPosition = 2
-            
-            let startBlock = SKSpriteNode(imageNamed: images[i])
-            startBlock.size = CGSize(width: 74, height: 74)
-            startBlock.position = positions[i]
-            startBlock.name = images[i]
-            startBlock.zPosition = 4
-            scene.addChild(startBlockBack)
-            scene.addChild(startBlock)
-            scene.startArrows.append(startBlock)
-        }
-    }
-    
-    private func setupGameArrows(count: Int, positions: [CGPoint], images: [String]) {
-        for i in 0..<count {
-            let gameArrow = SKSpriteNode(imageNamed: images[i])
-            gameArrow.size = CGSize(width: 77, height: 77)
-            gameArrow.position = positions[i]
-            gameArrow.name = images[i]
-            gameArrow.zPosition = 3
-            scene.addChild(gameArrow)
-            scene.arrows.append(gameArrow)
-        }
-    }
-    
-    // Level-specific setups
-    private func setup1Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 174, height: 343)
-        )
-        addGameBlocks(count: 2,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock90",
-                        "rotateRightOneBlock90"
-                      ])
-        setupGameArrows(count: 3,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y + 70),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y - 70)
-                        ],
-                        images: [
-                            "red90Arrow",
-                            "pink0Arrow",
-                            "yellow0Arrow"
-                        ])
-    }
-    
-    private func setup2Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 250, height: 146)
-        )
-        addGameBlocks(count: 2,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock90",
-                        "rotateOneBlock180"
-                      ])
-        setupGameArrows(count: 2,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 - 38, y: scene.gameBoard.position.y),
-                            CGPoint(x: scene.size.width / 2 + 38, y: scene.gameBoard.position.y)
-                        ],
-                        images: [
-                            "pink0Arrow",
-                            "green90Arrow"
-                        ])
-    }
-    
-    private func setup3Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 230, height: 227)
-        )
-        addGameBlocks(count: 2,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightTwoHorizontalBlocks90",
-                        "rotateLeftTwoVerticalBlocks90"
-                      ])
-        setupGameArrows(count: 3,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 - 38, y: scene.gameBoard.position.y + 45),
-                            CGPoint(x: scene.size.width / 2 + 38, y: scene.gameBoard.position.y + 45),
-                            CGPoint(x: scene.size.width / 2 + 38, y: scene.gameBoard.position.y - 28)
-                        ],
-                        images: [
-                            "red0Arrow",
-                            "orange90Arrow",
-                            "green180Arrow"
-                        ])
-    }
-    
-    private func setup4Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 343 / 1.3, height: 259 / 1.3)
-        )
-        addGameBlocks(count: 3,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateLeftOneBlock90",
-                        "rotateOneBlock180",
-                        "rotateRightOneBlock90"
-                      ])
-        setupGameArrows(count: 3,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 - 67, y: scene.gameBoard.position.y + 38),
-                            CGPoint(x: scene.size.width / 2 + 67, y: scene.gameBoard.position.y + 38),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y - 33)
-                        ],
-                        images: [
-                            "red270Arrow",
-                            "yellow0Arrow",
-                            "pink90Arrow"
-                        ])
-    }
-    
-    private func setup5Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 343 / 1.3, height: 174 / 1.3)
-        )
-        addGameBlocks(count: 3,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock135",
-                        "rotateRightOneBlock90",
-                        "rotateRightOneBlock45"
-                      ])
-        setupGameArrows(count: 3,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 - 67, y: scene.gameBoard.position.y + 5),
-                            CGPoint(x: scene.size.width / 2 + 67, y: scene.gameBoard.position.y + 5),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y + 5)
-                        ],
-                        images: [
-                            "orange315Arrow",
-                            "yellow225Arrow",
-                            "green270Arrow"
-                        ])
-    }
-    
-    private func setup6Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 299 / 1.3, height: 175 / 1.3)
-        )
-        addGameBlocks(count: 2,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock45",
-                        "rotateLeftOneBlock45"
-                      ])
-        setupGameArrows(count: 2,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y + 5),
-                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y + 5)
-                        ],
-                        images: [
-                            "green45Arrow",
-                            "red315Arrow"
-                        ])
-    }
-    
-    private func setup7Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 259 / 1.3, height: 343 / 1.3)
-        )
-        addGameBlocks(count: 3,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock135",
-                        "rotateLeftOneBlock45",
-                        "rotateRightOneBlock45"
-                      ])
-        setupGameArrows(count: 3,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 - 35, y: scene.gameBoard.position.y - 65),
-                            CGPoint(x: scene.size.width / 2 + 40, y: scene.gameBoard.position.y + 5),
-                            CGPoint(x: scene.size.width / 2 - 35, y: scene.gameBoard.position.y + 65)
-                        ],
-                        images: [
-                            "green45Arrow",
-                            "red315Arrow",
-                            "orange135Arrow"
-                        ])
-    }
-    
-    private func setup8Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 174 / 1.3, height: 343 / 1.3)
-        )
-        addGameBlocks(count: 2,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateOneBlock180",
-                        "rotateLeftOneBlock90"
-                      ])
-        setupGameArrows(count: 3,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y - 65),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y + 5),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y + 75)
-                        ],
-                        images: [
-                            "yellow0Arrow",
-                            "pink270Arrow",
-                            "red180Arrow"
-                        ])
-    }
-    
-    private func setup9Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 342 / 1.3, height: 259 / 1.3)
-        )
-        addGameBlocks(count: 3,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateTwoBlocksHorizontal_45_135",
-                        "rotateRightOneBlock90",
-                        "rotateLeftTwoVerticalBlocks45"
-                      ])
-        setupGameArrows(count: 5,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 + 74, y: scene.gameBoard.position.y - 42),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y + 30),
-                            CGPoint(x: scene.size.width / 2 + 74, y: scene.gameBoard.position.y + 30),
-                            CGPoint(x: scene.size.width / 2 - 74, y: scene.gameBoard.position.y + 30),
-                            CGPoint(x: scene.size.width / 2 - 74, y: scene.gameBoard.position.y - 42)
-                        ],
-                        images: [
-                            "yellow45Arrow",
-                            "red225Arrow",
-                            "green45Arrow",
-                            "orange315Arrow",
-                            "pink270Arrow"
-                        ])
-    }
-    
-    private func setup10Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 299 / 1.3, height: 175 / 1.3)
-        )
-        addGameBlocks(count: 3,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock135",
-                        "rotateOneBlock180",
-                        "rotateTwoBlocksHorizontal_90_45"
-                      ])
-        setupGameArrows(count: 2,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 + 72 / 2, y: scene.gameBoard.position.y + 5),
-                            CGPoint(x: scene.size.width / 2 - 72 / 2, y: scene.gameBoard.position.y + 5)
-                        ],
-                        images: [
-                            "pink0Arrow",
-                            "orange180Arrow"
-                        ])
-    }
-    
-    private func setup11Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 342 / 1.3, height: 272 / 1.3)
-        )
-        addGameBlocks(count: 4,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 + 87 / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock90",
-                        "rotateRightOneBlock135",
-                        "rotateOneBlock180",
-                        "rotateRightOneBlock45"
-                      ])
-        setupGameArrows(count: 4,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y + 35),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y - 35),
-                            CGPoint(x: scene.size.width / 2 - 75, y: scene.gameBoard.position.y + 35),
-                            CGPoint(x: scene.size.width / 2 + 75, y: scene.gameBoard.position.y - 35)
-                        ],
-                        images: [
-                            "green225Arrow",
-                            "pink0Arrow",
-                            "orange315Arrow",
-                            "yellow270Arrow"
-                        ])
-    }
-    
-    private func setup12Level() {
-        setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 342 / 1.3, height: 272 / 1.3)
-        )
-        addGameBlocks(count: 4,
-                      positions: [
-                        CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 - 87 / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
-                        CGPoint(x: scene.size.width / 2 + 87 / 2 + 87, y: ScreenSizes.isSmallScreen ? 120 : 80)
-                      ],
-                      images: [
-                        "rotateRightOneBlock90",
-                        "rotateRightOneBlock135",
-                        "rotateOneBlock180",
-                        "rotateRightOneBlock45"
-                      ])
-        setupGameArrows(count: 4,
-                        positions: [
-                            CGPoint(x: scene.size.width / 2 - 75, y: scene.gameBoard.position.y - 35),
-                            CGPoint(x: scene.size.width / 2, y: scene.gameBoard.position.y - 35),
-                            CGPoint(x: scene.size.width / 2 - 75, y: scene.gameBoard.position.y + 35),
-                            CGPoint(x: scene.size.width / 2 + 75, y: scene.gameBoard.position.y - 35)
-                        ],
-                        images: [
-                            "pink315Arrow",
-                            "red135Arrow",
-                            "orange0Arrow",
-                            "yellow0Arrow"
-                        ])
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -485,13 +43,16 @@ final class GameScene: SKScene {
     
     // Nodes and collections
     var arrows: [SKSpriteNode] = []
-    var startArrows: [SKSpriteNode] = []
+    //    var startArrows: [SKSpriteNode] = []
+    var startArrows: [DraggingBlock] = []
     var usedBlocks: [SKSpriteNode] = []
     var usedStartBlocksCount = 0
     var gameBoard: SKSpriteNode!
     
     // Touch handling
-    var draggingBlock: SKSpriteNode?
+    //    var draggingBlock: SKSpriteNode?
+    
+    var draggingBlock: DraggingBlock?
     var originalPosition: CGPoint?
     
     // Timer and label
@@ -586,7 +147,7 @@ final class GameScene: SKScene {
             if startArrow.contains(location) {
                 draggingBlock = startArrow
                 draggingBlock?.alpha = 0.8
-                if startArrow.name?.contains("Two") == true {
+                if startArrow.name?.contains("Two") == true || startArrow.name?.contains("Four") == true {
                     draggingBlock?.size = CGSize(width: startArrow.size.width * 2,
                                                  height: startArrow.size.height * 2)
                 }
@@ -604,33 +165,97 @@ final class GameScene: SKScene {
         guard let draggingBlock = draggingBlock else { return }
         draggingBlock.removeFromParent()
         let location = touches.first!.location(in: self)
-        
-        if draggingBlock.name?.contains("Two") == true {
-            var blocksInArea: [SKSpriteNode] = []
-            if draggingBlock.name?.contains("Horizontal") == true {
-                blocksInArea = getBlocksInArea(draggingBlock: draggingBlock, count: 2, alignment: "Horizontal")
-            } else {
-                blocksInArea = getBlocksInArea(draggingBlock: draggingBlock, count: 2, alignment: "Vertical")
-            }
-            if blocksInArea.count == 2 {
-                if draggingBlock.name?.contains("_") == true && draggingBlock.name?.contains("Horizontal") == true {
-                    if let newNames = updateTwoNames(gameArrows: blocksInArea, gameBlock: draggingBlock) {
-                        blocksInArea[0].texture = SKTexture(imageNamed: newNames[0])
-                        blocksInArea[0].name = newNames[0]
-                        usedBlocks.append(blocksInArea[0])
-                        blocksInArea[1].texture = SKTexture(imageNamed: newNames[1])
-                        blocksInArea[1].name = newNames[1]
-                        usedBlocks.append(blocksInArea[1])
+        if draggingBlock.name!.contains("Four") {
+            getBlocksInArea(draggingBlock: draggingBlock)
+            print(draggingBlock.leftUp, draggingBlock.leftDown, draggingBlock.rightUp, draggingBlock.rightDown)
+            updateNames()
+            var changed = false
+            if let leftUp = draggingBlock.leftUp {
+                for i in arrows {
+                    if i == leftUp {
+                        i.name = leftUp.name
+                        i.texture = SKTexture(imageNamed: leftUp.name!)
+                        changed = true
                     }
-                } else {
-                    for block in blocksInArea {
-                        if let newName = updateNameArrow(gameArrow: block, gameBlock: draggingBlock) {
-                            block.texture = SKTexture(imageNamed: newName)
-                            block.name = newName
-                            usedBlocks.append(block)
+                }
+            }
+            if let leftDown = draggingBlock.leftDown {
+                for i in arrows {
+                    if i == leftDown {
+                        i.name = leftDown.name
+                        i.texture = SKTexture(imageNamed: leftDown.name!)
+                        changed = true
+                    }
+                }
+            }
+            if let rightUp = draggingBlock.rightUp {
+                for i in arrows {
+                    if i == rightUp {
+                        i.name = rightUp.name
+                        i.texture = SKTexture(imageNamed: rightUp.name!)
+                        changed = true
+                    }
+                }
+            }
+            if let rightDown = draggingBlock.rightDown {
+                for i in arrows {
+                    if i == rightDown {
+                        i.name = rightDown.name
+                        i.texture = SKTexture(imageNamed: rightDown.name!)
+                        changed = true
+                    }
+                }
+            }
+            if changed == true {
+                usedStartBlocksCount += 1
+                self.draggingBlock = nil
+                originalPosition = nil
+            }
+        } else if draggingBlock.name?.contains("Two") == true {
+            getBlocksInArea(draggingBlock: draggingBlock)
+            updateNames()
+            var changed = false
+            if draggingBlock.name!.contains("Horizontal") {
+                if let left = draggingBlock.left {
+                    for i in arrows {
+                        if i == left {
+                            i.name = left.name
+                            i.texture = SKTexture(imageNamed: left.name!)
+                            changed = true
                         }
                     }
                 }
+                if let right = draggingBlock.right {
+                    for i in arrows {
+                        if i == right {
+                            i.name = right.name
+                            i.texture = SKTexture(imageNamed: right.name!)
+                            changed = true
+                        }
+                    }
+                }
+            } else if draggingBlock.name!.contains("Vertical") {
+                if let up = draggingBlock.up {
+                    for i in arrows {
+                        if i == up {
+                            i.name = up.name
+                            i.texture = SKTexture(imageNamed: up.name!)
+                            changed = true
+                        }
+                    }
+                }
+                if let down = draggingBlock.down {
+                    for i in arrows {
+                        if i == down {
+                            i.name = down.name
+                            i.texture = SKTexture(imageNamed: down.name!)
+                            changed = true
+                        }
+                    }
+                }
+                
+            }
+            if changed == true {
                 usedStartBlocksCount += 1
                 self.draggingBlock = nil
                 originalPosition = nil
@@ -649,11 +274,10 @@ final class GameScene: SKScene {
                 }
             }
         }
-        
         if let originalPosition = originalPosition {
             draggingBlock.position = originalPosition
             let size = draggingBlock.size
-            draggingBlock.size = CGSize(width: size.width / 2, height: size.height / 2)
+            draggingBlock.size = CGSize(width: 74, height: 74)
             draggingBlock.alpha = 1
             addChild(draggingBlock)
         }
@@ -663,16 +287,18 @@ final class GameScene: SKScene {
         
         checkWinCondition()
         checkLoseCondition()
+        
     }
     
-    func getBlocksInArea(draggingBlock: SKSpriteNode, count: Int, alignment: String) -> [SKSpriteNode] {
+    func getBlocksInArea(draggingBlock: DraggingBlock)  {
         let minX = draggingBlock.position.x - draggingBlock.frame.size.width / 4
         let maxX = draggingBlock.position.x + draggingBlock.frame.size.width / 4
-        let minY = draggingBlock.position.y - draggingBlock.frame.size.height / 4
-        let maxY = draggingBlock.position.y + draggingBlock.frame.size.height / 4
+        let minY = draggingBlock.position.y - draggingBlock.frame.size.height / 8
+        let maxY = draggingBlock.position.y + draggingBlock.frame.size.height / 8
         
         var blocksInArea: [(block: SKSpriteNode, intersectionArea: CGFloat)] = []
         
+        // Собираем блоки, пересекающиеся с областью draggingBlock
         for block in arrows {
             let blockMinX = block.position.x - block.frame.size.width / 2
             let blockMaxX = block.position.x + block.frame.size.width / 2
@@ -691,35 +317,62 @@ final class GameScene: SKScene {
             }
         }
         
-        var groupedBlocks: [CGFloat: [SKSpriteNode]] = [:]
-        if alignment == "Vertical" {
+        // Определяем положение блоков относительно draggingBlock
+        if draggingBlock.name!.contains("Horizontal") {
             for (block, _) in blocksInArea {
-                let key = block.position.y
-                groupedBlocks[key, default: []].append(block)
+                let dx = block.position.x - draggingBlock.position.x
+                if abs(dx) < 50 {
+                    if dx < 0 {
+                        draggingBlock.left = block
+                    } else {
+                        draggingBlock.right = block
+                    }
+                }
             }
-        } else if alignment == "Horizontal" {
+        } else if draggingBlock.name!.contains("Vertical") {
             for (block, _) in blocksInArea {
-                let key = block.position.x
-                groupedBlocks[key, default: []].append(block)
+                let dy = block.position.y - draggingBlock.position.y
+                if dy < 0 {
+                    draggingBlock.down = block
+                } else {
+                    draggingBlock.up = block
+                }
+            }
+        } else if draggingBlock.name!.contains("Four") {
+            // Для блока типа "Four" распределяем по четырем сторонам
+            for (block, _) in blocksInArea {
+                let dx = block.position.x - draggingBlock.position.x
+                let dy = block.position.y - draggingBlock.position.y
+                
+                if dx < 0 && dy > 0 {
+                    draggingBlock.leftUp = block
+                } else if dx > 0 && dy > 0 {
+                    draggingBlock.rightUp = block
+                } else if dx < 0 && dy < 0 {
+                    draggingBlock.leftDown = block
+                } else if dx > 0 && dy < 0 {
+                    draggingBlock.rightDown = block
+                }
+            }
+        } else if draggingBlock.name!.contains("Four") {
+            for (block, _) in blocksInArea {
+                let dx = block.position.x - draggingBlock.position.x
+                let dy = block.position.y - draggingBlock.position.y
+                
+                if dx < 0 && dy > 0 {
+                    draggingBlock.leftUp = block
+                } else if dx > 0 && dy > 0 {
+                    draggingBlock.rightUp = block
+                } else if dx < 0 && dy < 0 {
+                    draggingBlock.leftDown = block
+                } else if dx > 0 && dy < 0 {
+                    draggingBlock.rightDown = block
+                }
             }
         }
-        
-        var filteredBlocks: [SKSpriteNode] = []
-        for (_, group) in groupedBlocks {
-            if group.count >= 1 {
-                filteredBlocks.append(contentsOf: group)
-            }
-        }
-        
-        let sortedBlocks = blocksInArea.filter { filteredBlocks.contains($0.block) }
-            .sorted { $0.intersectionArea > $1.intersectionArea }
-        
-        var array = Array(sortedBlocks.prefix(count).map { $0.block })
-        if draggingBlock.name?.contains("_") == true && draggingBlock.name?.contains("Horizontal") == true {
-            array.sort { $0.position.x < $1.position.x }
-        }
-        return array
     }
+    
+    
     
     func checkLoseCondition() {
         if usedStartBlocksCount == startArrows.count && !isWin {
@@ -744,19 +397,13 @@ final class GameScene: SKScene {
     }
     
     func updateNameArrow(gameArrow: SKSpriteNode, gameBlock: SKSpriteNode) -> String? {
-        var arrowName = gameArrow.name ?? "nothing"
+        let arrowName = gameArrow.name ?? "nothing"
         if let arrowDegree = AngleHelper.extractAngle(from: arrowName) {
             if gameBlock.name == "rotateRightOneBlock90" {
                 let newValue = AngleHelper.calculateAngle(angle1: arrowDegree, angle2: 90)
                 return arrowName.replacingOccurrences(of: "\(arrowDegree)", with: "\(newValue)")
             } else if gameBlock.name == "rotateOneBlock180" {
                 let newValue = AngleHelper.calculateAngle(angle1: arrowDegree, angle2: 180)
-                return arrowName.replacingOccurrences(of: "\(arrowDegree)", with: "\(newValue)")
-            } else if gameBlock.name == "rotateRightTwoHorizontalBlocks90" {
-                let newValue = AngleHelper.calculateAngle(angle1: arrowDegree, angle2: 90)
-                return arrowName.replacingOccurrences(of: "\(arrowDegree)", with: "\(newValue)")
-            } else if gameBlock.name == "rotateLeftTwoVerticalBlocks90" {
-                let newValue = AngleHelper.subtractAngle(angle1: arrowDegree, angle2: 90)
                 return arrowName.replacingOccurrences(of: "\(arrowDegree)", with: "\(newValue)")
             } else if gameBlock.name == "rotateLeftOneBlock90" {
                 let newValue = AngleHelper.subtractAngle(angle1: arrowDegree, angle2: 90)
@@ -770,34 +417,118 @@ final class GameScene: SKScene {
             } else if gameBlock.name == "rotateLeftOneBlock45" {
                 let newValue = AngleHelper.subtractAngle(angle1: arrowDegree, angle2: 45)
                 return arrowName.replacingOccurrences(of: "\(arrowDegree)", with: "\(newValue)")
-            } else if gameBlock.name == "rotateLeftTwoVerticalBlocks45" {
-                let newValue = AngleHelper.subtractAngle(angle1: arrowDegree, angle2: 45)
-                return arrowName.replacingOccurrences(of: "\(arrowDegree)", with: "\(newValue)")
             }
         }
         return nil
     }
     
-    func updateTwoNames(gameArrows: [SKSpriteNode], gameBlock: SKSpriteNode) -> [String]? {
-        var arrowNames: [String] = []
-        var arrowDegrees: [Int?] = []
-        for arrow in gameArrows {
-            arrowNames.append(arrow.name ?? "nothing")
-            arrowDegrees.append(AngleHelper.extractAngle(from: arrow.name ?? "nothing"))
+    
+    func updateNames() {
+        guard let _ = draggingBlock else { return }
+        if draggingBlock!.name!.contains("Four") {
+            if draggingBlock!.name == "rotateFourBlocks90_90_90_90" {
+                if let leftUp = draggingBlock!.leftUp {
+                    let arrowDegree = AngleHelper.extractAngle(from: leftUp.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.leftUp!.name! = leftUp.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let leftDown = draggingBlock!.leftDown {
+                    let arrowDegree = AngleHelper.extractAngle(from: leftDown.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.leftDown!.name! = leftDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                
+                if let rightUp = draggingBlock!.rightUp {
+                    let arrowDegree = AngleHelper.extractAngle(from: rightUp.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.rightUp!.name! = rightUp.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                
+                if let rightDown = draggingBlock!.rightDown {
+                    let arrowDegree = AngleHelper.extractAngle(from: rightDown.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.rightDown!.name! = rightDown.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            }
+        } else if draggingBlock!.name!.contains("Horizontal") {
+            if draggingBlock!.name == "rotateTwoBlocksHorizontal_45_135" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 135)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                    
+                }
+            } else if  draggingBlock!.name == "rotateRightTwoHorizontalBlocks90" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                    print(right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)"))
+                    
+                }
+            }else if  draggingBlock!.name == "rotateTwoBlocksHorizontal_90_45" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            } else if draggingBlock!.name ==  "rotateTwoBlocksHorizontal_180_45" {
+                if let left = draggingBlock!.left {
+                    let arrowDegree = AngleHelper.extractAngle(from: left.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 180)
+                    draggingBlock!.left!.name! = left.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let right = draggingBlock!.right {
+                    let arrowDegree = AngleHelper.extractAngle(from: right.name ?? "nothing")
+                    let newValue = AngleHelper.calculateAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.right!.name! = right.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+            }
+        }else if draggingBlock!.name!.contains("Vertical") {
+            if draggingBlock!.name == "rotateLeftTwoVerticalBlocks90" {
+                if let up = draggingBlock!.up {
+                    let arrowDegree = AngleHelper.extractAngle(from: up.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.up!.name! = up.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                    print(up.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)"))
+                }
+                if let down = draggingBlock!.down {
+                    let arrowDegree = AngleHelper.extractAngle(from: down.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 90)
+                    draggingBlock!.down!.name! = down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                    print(down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)"))
+                    
+                }
+            } else if draggingBlock!.name == "rotateLeftTwoVerticalBlocks45" {
+                if let up = draggingBlock!.up {
+                    let arrowDegree = AngleHelper.extractAngle(from: up.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.up!.name! = up.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                }
+                if let down = draggingBlock!.down {
+                    let arrowDegree = AngleHelper.extractAngle(from: down.name ?? "nothing")
+                    let newValue = AngleHelper.subtractAngle(angle1: arrowDegree ?? 90, angle2: 45)
+                    draggingBlock!.down!.name! = down.name!.replacingOccurrences(of: "\(arrowDegree ?? 90)", with: "\(newValue)")
+                    
+                }
+            }
         }
-        if gameBlock.name == "rotateTwoBlocksHorizontal_45_135" {
-            let newValue = AngleHelper.calculateAngle(angle1: arrowDegrees[0]!, angle2: 45)
-            arrowNames[0] = arrowNames[0].replacingOccurrences(of: "\(arrowDegrees[0]!)", with: "\(newValue)")
-            let newValue2 = AngleHelper.calculateAngle(angle1: arrowDegrees[1]!, angle2: 135)
-            arrowNames[1] = arrowNames[1].replacingOccurrences(of: "\(arrowDegrees[1]!)", with: "\(newValue2)")
-            return arrowNames
-        } else if gameBlock.name == "rotateTwoBlocksHorizontal_90_45" {
-            let newValue = AngleHelper.calculateAngle(angle1: arrowDegrees[0]!, angle2: 90)
-            arrowNames[0] = arrowNames[0].replacingOccurrences(of: "\(arrowDegrees[0]!)", with: "\(newValue)")
-            let newValue2 = AngleHelper.subtractAngle(angle1: arrowDegrees[1]!, angle2: 45)
-            arrowNames[1] = arrowNames[1].replacingOccurrences(of: "\(arrowDegrees[1]!)", with: "\(newValue2)")
-            return arrowNames
-        }
-        return nil
+        
     }
+    
 }
