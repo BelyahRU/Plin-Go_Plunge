@@ -5,8 +5,8 @@ class HeardsManager: ObservableObject {
     
     static let shared = HeardsManager()
     
-    private let heardsKey = "heardsKey11"
-    private let lastUpdateKey = "lastUpdateKey11"
+    private let heardsKey = "heardsKey111"
+    private let lastUpdateKey = "lastUpdateKey111"
     private var timer: Timer?
     
     @Published var currentHeards: Int
@@ -19,11 +19,13 @@ class HeardsManager: ObservableObject {
         }
     }
     
-    private var lastUpdate: Date {
+    private var lastUpdate: Date? {
         didSet {
             // Сохраняем время последнего обновления в виде TimeInterval
-            UserDefaults.standard.set(lastUpdate.timeIntervalSince1970, forKey: lastUpdateKey)
-            UserDefaults.standard.synchronize()
+            if lastUpdate != nil {
+                UserDefaults.standard.set(lastUpdate!.timeIntervalSince1970, forKey: lastUpdateKey)
+                UserDefaults.standard.synchronize()
+            }
         }
     }
     
@@ -33,7 +35,7 @@ class HeardsManager: ObservableObject {
         print(savedTimeInterval)
         if savedTimeInterval == 0 {
             self.lastUpdate = Date()
-            UserDefaults.standard.set(lastUpdate.timeIntervalSince1970, forKey: lastUpdateKey)
+            UserDefaults.standard.set(lastUpdate!.timeIntervalSince1970, forKey: lastUpdateKey)
         } else {
             self.lastUpdate = Date(timeIntervalSince1970: savedTimeInterval)
         }
@@ -44,22 +46,45 @@ class HeardsManager: ObservableObject {
         startTimer() // Запуск таймера
     }
 
+    public func boughtHeards(_ amount: Int) {
+        storedHeards += amount
+        self.currentHeards = self.storedHeards
+        if currentHeards >= 3 {
+            lastUpdate = nil
+            timeRemaining = "Full"
+            UserDefaults.standard.removeObject(forKey: lastUpdateKey)
+            startTimer()
+        }
+    }
     
-    public func addHeards(_ count: Int) {
+    private func addHeards(_ count: Int) {
         if currentHeards < 3 {
             storedHeards = min(3, currentHeards + count)
+            self.currentHeards = self.storedHeards
             lastUpdate = Date() // Обновляем время последнего обновления
+        } else {
+            lastUpdate = nil
+            timeRemaining = "Full"
+            UserDefaults.standard.removeObject(forKey: lastUpdateKey)
+            startTimer()
         }
     }
     
     public func subtractHeards(_ count: Int) -> Bool {
         if currentHeards >= count {
             storedHeards -= count
+            self.currentHeards = self.storedHeards
+            // Если теперь сердец меньше 3, запускаем таймер с новым lastUpdate
+            if currentHeards < 3 {
+                lastUpdate = Date() // Устанавливаем время начала отсчёта заново
+            }
+            startTimer()
             return true
         } else {
             return false
         }
     }
+
     
     private func startTimer() {
         // Инвалидируем старый таймер, если он существует
@@ -73,17 +98,18 @@ class HeardsManager: ObservableObject {
     
     private func updateHeards() {
         // Вычисляем прошедшее время с последнего обновления
-        let timeElapsed = Date().timeIntervalSince(lastUpdate)
+        guard let last = lastUpdate else {return}
+        let timeElapsed = Date().timeIntervalSince(lastUpdate!)
         
         // Если прошло больше часа, добавляем сердца
         if timeElapsed >= 3600 && currentHeards < 3 {
             let newHeards = Int(timeElapsed / 3600)
             addHeards(newHeards)
             // Сдвигаем lastUpdate на полные часы, а не сбрасываем его
-            lastUpdate = lastUpdate.addingTimeInterval(Double(newHeards * 3600))
+            lastUpdate = lastUpdate!.addingTimeInterval(Double(newHeards * 3600))
         }
         
-        updateTimeRemaining(timeElapsed: Date().timeIntervalSince(lastUpdate))
+        updateTimeRemaining(timeElapsed: Date().timeIntervalSince(lastUpdate!))
     }
 
     

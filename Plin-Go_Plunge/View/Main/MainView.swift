@@ -46,9 +46,9 @@ struct MainView: View {
                 .navigationBarHidden(true)
                 .blur(radius: isShopOpened ? 5 : 0)
                 if isShopOpened {
-                    ShopView {
+                    ShopView(onBack: {
                         isShopOpened = false
-                    }
+                    }, isPause: false)
                 }
                 
                 HStack(alignment: .center) {

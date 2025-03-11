@@ -28,7 +28,7 @@ struct GameOverView: View {
                 Button {
                     onMenu()
                 } label: {
-                    Image("menuButton")
+                    Image("menuButton1")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 231,height: 68)

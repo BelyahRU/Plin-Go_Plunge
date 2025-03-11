@@ -46,7 +46,7 @@ struct HeardsView: View {
             Text("\(heardsManager.currentHeards)")
                 .font(.custom("Kavoon-Regular", size: 25))
                 .foregroundStyle(.white)
-                .padding(.leading, 22)
+                .padding(.leading, heardsManager.currentHeards.description.count >= 2 ? 18 : 23)
                 .padding(.top, -7)
         }
         .navigationBarHidden(true)

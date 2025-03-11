@@ -13,6 +13,12 @@ final class GameScene: SKScene {
     var originalPosition: CGPoint?
     var isWin = false
     
+    var timerLabel: SKLabelNode!
+    
+    private var remainingTime: Int = 120
+    var timeOfLevel: Int = 120
+    var timer: Timer?
+    
     var firstGameArrowIsLocked = false
     var secondGameArrowIsLocked = false
     var thirdGameArrowIsLocked = false
@@ -33,8 +39,10 @@ final class GameScene: SKScene {
     override func didMove(to view: SKView) {
         configureScene()
         configureSnowBottom()
-        
+        configureLevelLabel()
         setupLevel()
+        startTimer()
+        addTimerLabel()
     }
     
     func configureScene() {
@@ -46,9 +54,61 @@ final class GameScene: SKScene {
         let bottomView = SKSpriteNode(imageNamed: "snowBottomImage")
         bottomView.size = CGSize(width: self.size.width+60, height: bottomViewHeight)
         bottomView.position = CGPoint(x: self.size.width / 2, y: bottomViewHeight / 2)
-        bottomView.zPosition = 1
+        bottomView.zPosition = 1.2
         
         addChild(bottomView)
+    }
+    
+    func configureLevelLabel() {
+        let lvlView = SKSpriteNode(imageNamed: "lvlLabel\(currentLevel)")
+        lvlView.size = CGSize(width: 124, height: 96)
+        lvlView.position = CGPoint(x: self.size.width / 2, y: 220)
+        lvlView.zPosition = 1.0
+        
+        addChild(lvlView)
+    }
+    
+    public func startTimer() {
+            // Создаем таймер, который уменьшает оставшееся время каждую секунду
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            if self.remainingTime > 0 {
+                self.remainingTime -= 1
+                self.updateTimerLabel()
+            } else {
+                self.endGameDueToTimeout()
+            }
+        }
+    }
+    
+    private func addTimerLabel() {
+        // Создаем текстовый узел для отображения времени
+        timerLabel = SKLabelNode(text: "Time: \(remainingTime)s")
+        timerLabel.fontName = "Kavoon-Regular"
+        timerLabel.fontSize = 33
+        timerLabel.fontColor = UIColor(red: 72/255, green: 220/255, blue: 240/255, alpha: 1)
+        timerLabel.position = CGPoint(x: size.width / 2, y: 150)
+        timerLabel.zPosition = 2
+        addChild(timerLabel)
+    }
+    
+    private func updateTimerLabel() {
+        timerLabel.text = "Time: \(remainingTime)s"
+    }
+    
+    private func endGameDueToTimeout() {
+            // Останавливаем таймер
+        
+        if usedStartBlocksCount != startArrows.count && !isWin {
+            timer?.invalidate()
+            
+            print("Игра завершена по истечении времени!")
+            
+            
+            self.isPaused = true
+            // Показываем GameOverView
+            NotificationCenter.default.post(name: NSNotification.Name("GameOver"), object: nil)
+        }
     }
     
     
@@ -248,6 +308,8 @@ final class GameScene: SKScene {
     func checkLoseCondition() {
         if usedStartBlocksCount == startArrows.count && !isWin {
             print("Lose!")
+            timer?.invalidate()
+            self.isPaused = true
             NotificationCenter.default.post(name: NSNotification.Name("GameOver"), object: nil)
         }
     }
@@ -260,6 +322,8 @@ final class GameScene: SKScene {
         print(angles)
         if angles.count == arrows.count && angles.allSatisfy({ $0 == angles.first }) {
             isWin = true
+            timer?.invalidate()
+            self.isPaused = true
             print("Win!")
             NotificationCenter.default.post(name: NSNotification.Name("Win"), object: nil)
         }

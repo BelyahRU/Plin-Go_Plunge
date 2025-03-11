@@ -4,6 +4,7 @@ import SwiftUI
 struct ShopView: View {
     
     var onBack: () -> Void
+    var isPause: Bool
     
     var body: some View {
         ZStack(alignment: .center) {
@@ -38,6 +39,7 @@ struct ShopView: View {
                         .frame(width: 144, height: 162)
                     Button {
                         print("shopItem150")
+                        HeardsManager.shared.boughtHeards(3)
                     } label: {
                         Image("shopButton150")
                             .resizable()
@@ -56,6 +58,7 @@ struct ShopView: View {
                         .frame(width: 144, height: 162)
                     Button {
                         print("shopItem300")
+                        HeardsManager.shared.boughtHeards(6)
                     } label: {
                         Image("shopButton300")
                             .resizable()
@@ -77,6 +80,7 @@ struct ShopView: View {
                     .frame(width: 144, height: 162)
                 Button {
                     print("shopItem550")
+                    HeardsManager.shared.boughtHeards(9)
                 } label: {
                     Image("shopButton550")
                         .resizable()

@@ -12,12 +12,9 @@ class DailyBonusManager: ObservableObject {
     // MARK: - Published Properties для обновления UI
     @Published var isBonusActive: Bool = false
     @Published var timeRemaining: String = "00:00"  // формат hh:mm
-    @Published var currentBonusDay: Int = 1         // от 1 до 5
+    @Published var currentBonusDay: Int = 1         
     
-    /// Для отображения прогресс-бара (progress0...progress5)
     var progressImageName: String {
-        // Если бонус ещё не получен, показываем progress0, далее progress1...progress5
-        // Здесь можно выбрать схему отображения – например, progress индекс = currentBonusDay - 1
         return "progress\(currentBonusDay - 1)"
     }
     

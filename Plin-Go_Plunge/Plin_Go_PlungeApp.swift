@@ -15,6 +15,9 @@ struct Plin_Go_PlungeApp: App {
             } else {
                 MainView()
                     .edgesIgnoringSafeArea(.all)
+                    .onAppear {
+//                        HeardsManager.shared
+                    }
             }
         }
         
