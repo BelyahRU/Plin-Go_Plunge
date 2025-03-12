@@ -116,7 +116,7 @@ final class GameScene: SKScene {
         timerLabel.fontName = "Kavoon-Regular"
         timerLabel.fontSize = 33
         timerLabel.fontColor = UIColor(red: 32/255.0, green: 102/255.0, blue: 173/255.0, alpha: 1)
-        timerLabel.position = CGPoint(x: size.width / 2, y: 150)
+        timerLabel.position = CGPoint(x: size.width / 2, y: ScreenSizes.isSmallScreen ? 160 : 150)
         timerLabel.zPosition = 2
         addChild(timerLabel)
     }
@@ -375,7 +375,8 @@ final class GameScene: SKScene {
     func checkLoseCondition() {
         if usedStartBlocksCount == startArrows.count && !isWin {
             print("Lose!")
-            timerManager.stop()
+//            timerManager.stop()
+            timerManager.timer?.invalidate()
             isPaused = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 NotificationCenter.default.post(name: NSNotification.Name("GameOver"), object: nil)

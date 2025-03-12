@@ -43,8 +43,10 @@ final class LevelSetupManager {
     
     private func addGameBlocks(count: Int, positions: [CGPoint], images: [String]) {
         for i in 0..<count {
+            
+            var blockSize = ScreenSizes.isSmallScreen ? 60 : 74
             let startBlockBack = SKSpriteNode(imageNamed: "startBlockImage")
-            startBlockBack.size = CGSize(width: 74, height: 74)
+            startBlockBack.size = CGSize(width: blockSize, height: blockSize)
             startBlockBack.position = positions[i]
             startBlockBack.zPosition = 2
             scene.addChild(startBlockBack)
@@ -53,7 +55,7 @@ final class LevelSetupManager {
             let startBlock = DraggingBlock(
                 texture: SKTexture(imageNamed: images[i]),
                 color: .clear,
-                size: CGSize(width: 74, height: 74)
+                size: CGSize(width: blockSize, height: blockSize)
             )
             startBlock.position = positions[i]
             startBlock.name = images[i]
@@ -78,8 +80,8 @@ final class LevelSetupManager {
     // Level-specific setups
     private func setup1Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
-            size: CGSize(width: 174, height: 343)
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
+            size: CGSize(width: 174 / 1.3, height: 343 / 1.3)
         )
         addGameBlocks(count: 2,
                       positions: [
@@ -105,7 +107,7 @@ final class LevelSetupManager {
     
     private func setup2Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 250, height: 146)
         )
         addGameBlocks(count: 2,
@@ -130,7 +132,7 @@ final class LevelSetupManager {
     
     private func setup3Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 230, height: 227)
         )
         addGameBlocks(count: 2,
@@ -157,7 +159,7 @@ final class LevelSetupManager {
     
     private func setup4Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 343 / 1.3, height: 259 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -186,7 +188,7 @@ final class LevelSetupManager {
     
     private func setup5Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 343 / 1.3, height: 174 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -215,7 +217,7 @@ final class LevelSetupManager {
     
     private func setup6Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 299 / 1.3, height: 175 / 1.3)
         )
         addGameBlocks(count: 2,
@@ -240,7 +242,7 @@ final class LevelSetupManager {
     
     private func setup7Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 259 / 1.3, height: 343 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -269,7 +271,7 @@ final class LevelSetupManager {
     
     private func setup8Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 174 / 1.3, height: 343 / 1.3)
         )
         addGameBlocks(count: 2,
@@ -296,7 +298,7 @@ final class LevelSetupManager {
     
     private func setup9Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 342 / 1.3, height: 259 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -329,7 +331,7 @@ final class LevelSetupManager {
     
     private func setup10Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 299 / 1.3, height: 175 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -356,11 +358,16 @@ final class LevelSetupManager {
     
     private func setup11Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 342 / 1.3, height: 272 / 1.3)
         )
         addGameBlocks(count: 4,
-                      positions: [
+                      positions: ScreenSizes.isSmallScreen ? [
+                        CGPoint(x: scene.size.width / 2 + 75 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2 - 75 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2 - 75 / 2 - 75, y: ScreenSizes.isSmallScreen ? 120 : 80),
+                        CGPoint(x: scene.size.width / 2 + 75 / 2 + 75, y: ScreenSizes.isSmallScreen ? 120 : 80)
+                      ] : [
                         CGPoint(x: scene.size.width / 2 + 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
                         CGPoint(x: scene.size.width / 2 - 87 / 2, y: ScreenSizes.isSmallScreen ? 120 : 80),
                         CGPoint(x: scene.size.width / 2 - 87 / 2 - 87, y: ScreenSizes.isSmallScreen ? 120 : 80),
@@ -389,7 +396,7 @@ final class LevelSetupManager {
     
     private func setup12Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 342 / 1.3, height: 272 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -420,7 +427,7 @@ final class LevelSetupManager {
     
     private func setup13Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 273 / 1.3, height: 281 / 1.3)
         )
         addGameBlocks(count: 2,
@@ -447,7 +454,7 @@ final class LevelSetupManager {
     
     private func setup14Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 248 / 1.3, height: 259 / 1.3)
         )
         addGameBlocks(count: 3,
@@ -476,7 +483,7 @@ final class LevelSetupManager {
     
     private func setup15Level() {
         setupGameBoard(
-            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 120 : ScreenSizes.screenHeight - 380),
+            position: CGPoint(x: scene.size.width / 2, y: ScreenSizes.isSmallScreen ? ScreenSizes.screenHeight - 260 : ScreenSizes.screenHeight - 380),
             size: CGSize(width: 259 / 1.3, height: 343 / 1.3)
         )
         addGameBlocks(count: 3,

@@ -42,7 +42,7 @@ struct MainView: View {
                     .position(x: ScreenSizes.screenWidth / 2, y: ScreenSizes.screenHeight - (ScreenSizes.isSmallScreen ? 100 : 150))
                     
                     DailyBonusView()
-                        .position(x: 70, y: 200)
+                        .position(x: 70, y: ScreenSizes.isSmallScreen ? 240 : 200)
                 }
                 .navigationBarHidden(true)
                 .blur(radius: isShopOpened ? 5 : 0)

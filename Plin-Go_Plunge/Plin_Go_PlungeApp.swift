@@ -17,9 +17,7 @@ struct Plin_Go_PlungeApp: App {
                     .edgesIgnoringSafeArea(.all)
                     .onAppear {
                     }
-//                GameView(currentLevel: 10) {
-//                    print()
-//                }
+//                GameView(currentLevel: 1, onMain: {})
             }
         }
         

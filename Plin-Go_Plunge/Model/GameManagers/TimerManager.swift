@@ -4,7 +4,7 @@ import SpriteKit
 
 // MARK: - TimerManager
 final class TimerManager {
-    private var timer: Timer?
+    var timer: Timer?
     private(set) var remainingTime: Int
     let timeOfLevel: Int
     var onTick: ((Int) -> Void)?

@@ -137,6 +137,7 @@ struct ShopView: View {
                 })
             )
         }
+        .padding(.top,ScreenSizes.isSmallScreen ? 120 : 0)
 
     }
 }

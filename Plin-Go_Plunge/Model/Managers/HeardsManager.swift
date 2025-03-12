@@ -40,7 +40,7 @@ final class HeardsManager: ObservableObject {
             self.lastUpdate = Date(timeIntervalSince1970: savedTimeInterval)
         }
         
-        self.storedHeards = UserDefaults.standard.object(forKey: heardsKey) as? Int ?? 0
+        self.storedHeards = UserDefaults.standard.object(forKey: heardsKey) as? Int ?? 3
         self.currentHeards = self.storedHeards
         updateHeards()
         startTimer() // Запуск таймера
