@@ -16,6 +16,7 @@ struct Plin_Go_PlungeApp: App {
                 MainView()
                     .edgesIgnoringSafeArea(.all)
                     .onAppear {
+                        print(ScreenSizes.screenHeight)
                     }
 //                GameView(currentLevel: 1, onMain: {})
             }

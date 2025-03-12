@@ -10,6 +10,7 @@ final class ScreenSizes {
     static let screenHeight = UIScreen.main.bounds.height
     
     static let isSmallScreen = UIScreen.main.bounds.height < 700
+    static let isBigScreen = UIScreen.main.bounds.height > 920
     
 }
 

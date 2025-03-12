@@ -21,7 +21,7 @@ struct MainView: View {
                             .frame(width: 86, height: 101)
                     })
                     .frame(width: 86, height: 101)
-                    .position(x: ScreenSizes.screenWidth - 100, y: 280)
+                    .position(x: ScreenSizes.screenWidth - (ScreenSizes.isBigScreen ? 105 : 100), y: ScreenSizes.isBigScreen ? 310 : 280)
                     
                     VStack(spacing: 0) {
                         // Навигация на ArtifactsView

@@ -66,7 +66,7 @@ struct TutorialView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: boardWidth / (ScreenSizes.isSmallScreen ? 1: 1.3))
-                            .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 50: 0))
+                            .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 50: 0) - (ScreenSizes.isBigScreen ? 37 : 0))
                         
                         VStack(spacing: -9) {
                             Image("red90Arrow")
@@ -99,7 +99,7 @@ struct TutorialView: View {
                                     }
                                 )
                         }
-                        .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 50: 0))
+                        .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 50: 0)  - (ScreenSizes.isBigScreen ? 37 : 0))
                     }
                     
                     // Исходный текст над игровым полем
@@ -193,7 +193,7 @@ struct TutorialView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 93, height: 107)
-                        .position(CGPoint(x: screenWidth / 2 - 50, y: screenHeight - 135))
+                        .position(CGPoint(x: screenWidth / 2 - 40, y: screenHeight - 135))
                         .offset(animate2 ? combinedOffset2 : .zero)
                         .animation(.easeInOut(duration: 1), value: animate2)
                         .zIndex(3)
@@ -205,8 +205,8 @@ struct TutorialView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 53, height: 53)
-                        .position(x: screenWidth - 39,
-                                  y: screenHeight - 288 + 50 - (ScreenSizes.isSmallScreen ? 50 : 0))
+                        .position(x: screenWidth - 39 - (ScreenSizes.isBigScreen ? 3: 0),
+                                  y: screenHeight - 288 + 50 - (ScreenSizes.isSmallScreen ? 50 : 0) + (ScreenSizes.isBigScreen ? 8: 0))
                         .zIndex(30)
                 }
                 
@@ -225,7 +225,8 @@ struct TutorialView: View {
                     Image("snowBottomImage")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: screenWidth + 60, height: 220)
+//                        .frame(width: screenWidth + 60, height: 220)
+                        .frame(width: screenWidth + 60)
                         .ignoresSafeArea()
                     VStack(spacing: 10) {
                         Text("Time: 120s")
@@ -317,7 +318,7 @@ struct TutorialView: View {
                     .frame(width: 42, height: 27)
                 }
                 .padding(.horizontal, 16)
-                .position(CGPoint(x: screenWidth / 2, y: ScreenSizes.isSmallScreen ? 200 : 100))
+                .position(CGPoint(x: screenWidth / 2, y: ScreenSizes.isSmallScreen ? 200 : 100 - (ScreenSizes.isBigScreen ? 10: 0)))
                 .zIndex(100)
             }
             .onAppear {

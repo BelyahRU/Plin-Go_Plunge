@@ -17,7 +17,7 @@ struct GameView: View {
     @State private var isShopOpened = false
     @State private var isHeart = false
     
-    @AppStorage("isFirst") var isFirst = true
+    @AppStorage("isFirst22222222232") var isFirst = true
     
     
     
