@@ -151,7 +151,7 @@ struct GameView: View {
                 }
                 
                 if showNotEnoughtAlert {
-                    CustomAlertView {
+                    CustomAlertView(isReplay: true) {
                         showNotEnoughtAlert = false
                     }
                     .padding(.bottom, ScreenSizes.isSmallScreen ? 120 : 0)

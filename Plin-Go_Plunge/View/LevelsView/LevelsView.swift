@@ -200,7 +200,7 @@ struct LevelsView: View {
                     .edgesIgnoringSafeArea(.all)
                     
                     if showNotEnoughtAlert {
-                        CustomAlertView {
+                        CustomAlertView(isReplay: false) {
                             showNotEnoughtAlert = false
                         }
                         .padding(.bottom, ScreenSizes.isSmallScreen ? 120 : 0)

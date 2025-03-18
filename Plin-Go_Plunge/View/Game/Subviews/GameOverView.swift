@@ -1,12 +1,23 @@
 import SwiftUI
 
-import SwiftUI
+
 
 struct CustomAlertView: View {
     var title: String = "Not Enough Hearts"
-    var message: String = "You don't have enough hearts to play.\nYou can purchase hearts or wait until they are automatically added."
+    var message: String
     var dismissButtonTitle: String = "Cancel"
+    var isReplay: Bool
     var onDismiss: () -> Void
+    
+    init(isReplay: Bool, onDismiss: @escaping () -> Void) {
+        self.isReplay = isReplay
+        if isReplay {
+            self.message = "You don't have enough hearts to replay.\nYou can purchase hearts or wait until they are automatically added."
+        } else {
+            self.message = "You don't have enough hearts to play.\nYou can purchase hearts or wait until they are automatically added."
+        }
+        self.onDismiss = onDismiss
+    }
 
     var body: some View {
         ZStack {
@@ -91,7 +102,7 @@ struct GameOverView: View {
             
             // Если сердец недостаточно — отображаем кастомный алерт
             if showNotEnoughtAlert {
-                CustomAlertView {
+                CustomAlertView(isReplay: true) {
                     showNotEnoughtAlert = false
                 }
                 .padding(.bottom, ScreenSizes.isSmallScreen ? 120 : 0)

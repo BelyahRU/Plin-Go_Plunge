@@ -15,11 +15,6 @@ struct Plin_Go_PlungeApp: App {
             } else {
                 MainView()
                     .edgesIgnoringSafeArea(.all)
-                    .onAppear {
-//                        print(ScreenSizes.screenHeight)
-                        HeardsManager.shared.boughtHeards(3)
-                    }
-//                GameView(currentLevel: 1, onMain: {})
             }
         }
         
