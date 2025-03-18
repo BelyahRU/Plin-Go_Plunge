@@ -51,6 +51,7 @@ struct WinView: View {
                     }
                     .frame(width: 334, height: 415)
                 }
+                .padding(.bottom, ScreenSizes.isSmallScreen ? 50:0)
                 
                 VStack(alignment: .center, spacing: 12) {
                     Button {
@@ -71,6 +72,7 @@ struct WinView: View {
                             .frame(height: 50)
                     }
                 }
+                .padding(.bottom, ScreenSizes.isSmallScreen ? 50:0)
 
             }
             

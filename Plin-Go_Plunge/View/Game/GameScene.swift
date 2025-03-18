@@ -88,7 +88,7 @@ final class GameScene: SKScene {
         let bottomViewHeight: CGFloat = 220
         let bottomView = SKSpriteNode(imageNamed: "snowBottomImage")
         bottomView.size = CGSize(width: size.width + 60, height: bottomViewHeight)
-        bottomView.position = CGPoint(x: size.width / 2, y: bottomViewHeight / 2)
+        bottomView.position = CGPoint(x: size.width / 2, y: bottomViewHeight / 2 + (ScreenSizes.isSmallScreen ? 50 : 0))
         bottomView.zPosition = 1.2
         addChild(bottomView)
     }
@@ -96,7 +96,7 @@ final class GameScene: SKScene {
     private func configureLevelLabel() {
         let lvlView = SKSpriteNode(imageNamed: "lvlLabel\(currentLevel)")
         lvlView.size = CGSize(width: 124, height: 96)
-        lvlView.position = CGPoint(x: size.width / 2, y: 220)
+        lvlView.position = CGPoint(x: size.width / 2, y: 220 + (ScreenSizes.isSmallScreen ? 50 : 0))
         lvlView.zPosition = 1.0
         addChild(lvlView)
     }
@@ -116,7 +116,7 @@ final class GameScene: SKScene {
         timerLabel.fontName = "Kavoon-Regular"
         timerLabel.fontSize = 33
         timerLabel.fontColor = UIColor(red: 32/255.0, green: 102/255.0, blue: 173/255.0, alpha: 1)
-        timerLabel.position = CGPoint(x: size.width / 2, y: ScreenSizes.isSmallScreen ? 160 : 150)
+        timerLabel.position = CGPoint(x: size.width / 2, y: ScreenSizes.isSmallScreen ? 200 : 150)
         timerLabel.zPosition = 2
         addChild(timerLabel)
     }

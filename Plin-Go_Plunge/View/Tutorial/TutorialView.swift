@@ -66,7 +66,7 @@ struct TutorialView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: boardWidth / (ScreenSizes.isSmallScreen ? 1: 1.3))
-                            .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 50: 0) - (ScreenSizes.isBigScreen ? 37 : 0))
+                            .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 0: 0) - (ScreenSizes.isBigScreen ? 37 : 0))
                         
                         VStack(spacing: -9) {
                             Image("red90Arrow")
@@ -99,7 +99,7 @@ struct TutorialView: View {
                                     }
                                 )
                         }
-                        .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 50: 0)  - (ScreenSizes.isBigScreen ? 37 : 0))
+                        .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 + (ScreenSizes.isSmallScreen ? 0: 0)  - (ScreenSizes.isBigScreen ? 37 : 0))
                     }
                     
                     // Исходный текст над игровым полем
@@ -114,7 +114,7 @@ struct TutorialView: View {
                                 .foregroundStyle(Color(red: 72/255, green: 220/255, blue: 240/255))
                                 .customeStroke(color: Color(red: 7/255, green: 47/255, blue: 88/255), width: 2)
                         }
-                        .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin + (ScreenSizes.isSmallScreen ? 50: 0))
+                        .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin + (ScreenSizes.isSmallScreen ? 0: 0))
                         .zIndex(10)
                     }
                 }
@@ -140,7 +140,7 @@ struct TutorialView: View {
                             .foregroundStyle(Color(red: 72/255, green: 220/255, blue: 240/255))
                             .customeStroke(color: Color(red: 7/255, green: 47/255, blue: 88/255), width: 2)
                     }
-                    .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin - 20 + (ScreenSizes.isSmallScreen ? 55: 0))
+                    .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin - 20 + (ScreenSizes.isSmallScreen ? 5: 0))
                     .zIndex(20)
                 }
                 
@@ -155,7 +155,7 @@ struct TutorialView: View {
                             .foregroundStyle(Color(red: 72/255, green: 220/255, blue: 240/255))
                             .customeStroke(color: Color(red: 7/255, green: 47/255, blue: 88/255), width: 2)
                     }
-                    .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin + (ScreenSizes.isSmallScreen ? 55: 0))
+                    .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin + (ScreenSizes.isSmallScreen ? 5: 0))
                     .zIndex(20)
                 }
                 if showNewText3 {
@@ -169,7 +169,7 @@ struct TutorialView: View {
                             .foregroundStyle(Color(red: 72/255, green: 220/255, blue: 240/255))
                             .customeStroke(color: Color(red: 7/255, green: 47/255, blue: 88/255), width: 2)
                     }
-                    .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin + (ScreenSizes.isSmallScreen ? 55: 0))
+                    .position(x: screenWidth / 2 + 4.5, y: screenHeight / 2 - boardHeight / 4 + 25 - boardHeight / 2 - textMargin + (ScreenSizes.isSmallScreen ? 5: 0))
                     .zIndex(20)
                 }
                 
@@ -182,7 +182,7 @@ struct TutorialView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 93, height: 107)
-                        .position(CGPoint(x: screenWidth / 2 + 50, y: screenHeight - 135))
+                        .position(CGPoint(x: screenWidth / 2 + 50, y: screenHeight - 135 - (ScreenSizes.isSmallScreen ? 50:0)))
                         .offset(animate ? combinedOffset : .zero)
                         .animation(.easeInOut(duration: 1), value: animate)
                         .zIndex(3)
@@ -193,7 +193,7 @@ struct TutorialView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 93, height: 107)
-                        .position(CGPoint(x: screenWidth / 2 - 40, y: screenHeight - 135))
+                        .position(CGPoint(x: screenWidth / 2 - 40, y: screenHeight - 135 - (ScreenSizes.isSmallScreen ? 50:0)))
                         .offset(animate2 ? combinedOffset2 : .zero)
                         .animation(.easeInOut(duration: 1), value: animate2)
                         .zIndex(3)
@@ -285,7 +285,7 @@ struct TutorialView: View {
                     }
                     
                 }
-                .position(CGPoint(x: screenWidth / 2, y: screenHeight - 110))
+                .position(CGPoint(x: screenWidth / 2, y: screenHeight - (ScreenSizes.isSmallScreen ? 160 : 110)))
                 .zIndex(2)
                 .ignoresSafeArea(.all)
                 
@@ -318,7 +318,7 @@ struct TutorialView: View {
                     .frame(width: 42, height: 27)
                 }
                 .padding(.horizontal, 16)
-                .position(CGPoint(x: screenWidth / 2, y: ScreenSizes.isSmallScreen ? 200 : 100 - (ScreenSizes.isBigScreen ? 10: 0)))
+                .position(CGPoint(x: screenWidth / 2, y: ScreenSizes.isSmallScreen ? 150 : 100 - (ScreenSizes.isBigScreen ? 10: 0)))
                 .zIndex(100)
             }
             .onAppear {
@@ -369,7 +369,7 @@ struct TutorialView: View {
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                                             let targetX = screenWidth / 2 + 4.5
-                                            let targetY = (screenHeight - 200)
+                                            let targetY = (screenHeight - 200 - (ScreenSizes.isSmallScreen ? 50:0))
                                             isHeart = false
                                             withAnimation(.easeInOut(duration: 0.5)) {
                                                 handImage2Position = CGPoint(x: targetX, y: targetY)

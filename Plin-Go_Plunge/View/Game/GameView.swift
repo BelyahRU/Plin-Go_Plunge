@@ -8,6 +8,7 @@ struct GameView: View {
     //win
     @State var timeOfLevel = 120
     @State private var isLevelWinBefore = true
+    @State var showNotEnoughtAlert = false
     
     @State var currentLevel = 2
     @State var gameScene: GameScene
@@ -17,7 +18,8 @@ struct GameView: View {
     @State private var isShopOpened = false
     @State private var isHeart = false
     
-    @AppStorage("isFirst22222222232") var isFirst = true
+    @AppStorage("isFirst2f2f222f532242232") var isFirst = true
+//    @State var isFirst = true
     
     
     
@@ -55,10 +57,14 @@ struct GameView: View {
                         .frame(width: 53, height: 53)
                         Spacer()
                         Button {
-                            isHeart = true
-                            gameScene.isPaused = true
-    //                        gameScene.timer?.invalidate()
-                            gameScene.timerManager.stop()
+                            if HeardsManager.shared.currentHeards == 0 {
+                                showNotEnoughtAlert = true
+                            } else {
+                                isHeart = true
+                                gameScene.isPaused = true
+        //                        gameScene.timer?.invalidate()
+                                gameScene.timerManager.stop()
+                            }
                         } label: {
                             Image("replayButton")
                                 .resizable()
@@ -74,16 +80,19 @@ struct GameView: View {
                 .edgesIgnoringSafeArea(.all)
                 .blur(radius: (isGameOver || isWin || isPaused || isShopOpened || isHeart) ? 5 : 0)
                 HeartsGameView()
-                    .position(x: 45, y: ScreenSizes.isSmallScreen ? 135 :85)
+                    .position(x: 45, y: ScreenSizes.isSmallScreen ? 85 :85)
                     .blur(radius: (isGameOver || isWin || isPaused ) ? 5 : 0)
                 CoinsView()
-                    .position(x: ScreenSizes.screenWidth - 70, y: ScreenSizes.isSmallScreen ? 135 :85)
+                    .position(x: ScreenSizes.screenWidth - 70, y: ScreenSizes.isSmallScreen ? 85 :85)
                     .blur(radius: (isGameOver || isWin || isPaused || isHeart) ? 5 : 0)
                 if isGameOver {
                     GameOverView {
                         isHeart = true
                     } onMenu: {
                         onMain()
+                    }
+                    .onAppear {
+                        gameScene.timerManager.stop()
                     }
 
                 }
@@ -139,6 +148,13 @@ struct GameView: View {
                         gameScene.timerManager.start()
                     }
 
+                }
+                
+                if showNotEnoughtAlert {
+                    CustomAlertView {
+                        showNotEnoughtAlert = false
+                    }
+                    .padding(.bottom, ScreenSizes.isSmallScreen ? 120 : 0)
                 }
             }
             .navigationBarHidden(true)

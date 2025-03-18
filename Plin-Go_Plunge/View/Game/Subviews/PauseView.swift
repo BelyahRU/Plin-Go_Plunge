@@ -29,6 +29,7 @@ struct PauseView: View {
                     .frame(height: 54)
                     
                     Button {
+                        let _ = HeardsManager.shared.subtractHeards(1)
                         onMenu()
                     } label: {
                         Image("pauseMenuButton")
@@ -49,7 +50,9 @@ struct PauseView: View {
                     .frame(height: 54)
                 }
                 .padding(.top, 90)
+
             }
+            .padding(.bottom, (ScreenSizes.isSmallScreen ? 70:0))
 
 
         }

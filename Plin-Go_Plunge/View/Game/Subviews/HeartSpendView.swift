@@ -40,7 +40,7 @@ struct HeartSpendView: View {
                 }
                 .padding(.bottom, 50)
             }
-
+            .padding(.bottom, (ScreenSizes.isSmallScreen ? 50:0))
 
         }
         .edgesIgnoringSafeArea(.all)

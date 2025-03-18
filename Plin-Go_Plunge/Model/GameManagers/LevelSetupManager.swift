@@ -36,7 +36,7 @@ final class LevelSetupManager {
     private func setupGameBoard(position: CGPoint, size: CGSize) {
         scene.gameBoard = SKSpriteNode(imageNamed: "gameBoard\(scene.currentLevel)")
         scene.gameBoard.size = size
-        scene.gameBoard.position = position
+        scene.gameBoard.position = CGPoint(x: position.x, y:position.y + (ScreenSizes.isSmallScreen ? 50 : 0))
         scene.gameBoard.zPosition = 2
         scene.addChild(scene.gameBoard)
     }
@@ -47,7 +47,7 @@ final class LevelSetupManager {
             var blockSize = ScreenSizes.isSmallScreen ? 60 : 74
             let startBlockBack = SKSpriteNode(imageNamed: "startBlockImage")
             startBlockBack.size = CGSize(width: blockSize, height: blockSize)
-            startBlockBack.position = positions[i]
+            startBlockBack.position = CGPoint(x: positions[i].x, y:positions[i].y + (ScreenSizes.isSmallScreen ? 35 : 0))
             startBlockBack.zPosition = 2
             scene.addChild(startBlockBack)
             
@@ -57,7 +57,7 @@ final class LevelSetupManager {
                 color: .clear,
                 size: CGSize(width: blockSize, height: blockSize)
             )
-            startBlock.position = positions[i]
+            startBlock.position = CGPoint(x: positions[i].x, y:positions[i].y + (ScreenSizes.isSmallScreen ? 35 : 0))
             startBlock.name = images[i]
             startBlock.zPosition = 4
             scene.addChild(startBlock)

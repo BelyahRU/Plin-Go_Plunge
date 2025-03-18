@@ -6,6 +6,7 @@ struct LevelsView: View {
     
     @State var currentPage = 0
     @State var isGame = false
+    @State var showNotEnoughtAlert = false
     @State var currentLevel = 0
     let totalLevels = 15
     let levelsPerPage = 4
@@ -36,7 +37,7 @@ struct LevelsView: View {
                                 
                         }
                         .frame(width: 50, height: 42)
-                        .position(x: 16 + 25, y: ScreenSizes.isSmallScreen ? 110 : 90) // Позиция по оси X с учетом отступа
+                        .position(x: 16 + 25, y: ScreenSizes.isSmallScreen ? 50 : 90) // Позиция по оси X с учетом отступа
                         
                         let startIndex = currentPage * levelsPerPage
                         let endIndex = min(startIndex + levelsPerPage, totalLevels)
@@ -65,6 +66,8 @@ struct LevelsView: View {
                                                     if HeardsManager.shared.currentHeards != 0 {
                                                         currentLevel = levelNumber
                                                         isGame = true
+                                                    } else {
+                                                        showNotEnoughtAlert.toggle()
                                                     }
                                                     
                                                 } label: {
@@ -114,6 +117,8 @@ struct LevelsView: View {
                                                     if HeardsManager.shared.currentHeards != 0 {
                                                         currentLevel = levelNumber
                                                         isGame = true
+                                                    } else {
+                                                        showNotEnoughtAlert.toggle()
                                                     }
                                                 } label: {
                                                     Image("lvl\(levelNumber)")
@@ -194,11 +199,17 @@ struct LevelsView: View {
                     .navigationBarHidden(true)
                     .edgesIgnoringSafeArea(.all)
                     
-                    
+                    if showNotEnoughtAlert {
+                        CustomAlertView {
+                            showNotEnoughtAlert = false
+                        }
+                        .padding(.bottom, ScreenSizes.isSmallScreen ? 120 : 0)
+                    }
                 }
                 
             }
         }
+        .padding(.top,ScreenSizes.isSmallScreen ? 120 : 0)
         
     }
 }
